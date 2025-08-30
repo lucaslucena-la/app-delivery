@@ -36,7 +36,7 @@ DATABASE_URL=postgres://postgres:1234@db:5432/delivery_db
 ## ▶️ Como rodar o projeto
 
 1) Subir os Containers
-** Na raiz do Projeto: **
+**Na raiz do Projeto:**
 ```env
 docker compose up --build
 ```

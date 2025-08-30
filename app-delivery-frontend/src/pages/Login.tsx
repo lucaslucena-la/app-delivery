@@ -3,9 +3,9 @@ import { apiFetch } from "../lib/api"; // função utilitária para chamadas à 
 import { useNavigate } from "react-router-dom"; // hook para redirecionamento
 import "./Login.css"; // importa o css
 
-// 📌 Componente Login
+//Componente Login
 export default function Login(){
-    const navigate = useNavigate();
+    const navigate = useNavigate(); 
 
     // Estados para guardar os inputs do formulário
     const [username, setUsername] = useState("");   // campo usuário
@@ -15,7 +15,7 @@ export default function Login(){
     const [loading, setLoading] = useState(false);  // mostra "Entrando..."
     const [error, setError] = useState<string | null>(null); // mensagem de erro
 
-    // 📌 Função chamada ao enviar o formulário
+    //Função chamada ao enviar o formulário
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();        // previne reload da página
         setLoading(true);          // ativa estado de carregamento
@@ -34,14 +34,14 @@ export default function Login(){
                 }
             );
 
-            // 📌 Se o login for bem-sucedido:
+            //Se o login for bem-sucedido:
             // Guarda o usuário no localStorage (simples; em app real seria JWT)
             localStorage.setItem("user", JSON.stringify(data.user));
 
             // Redireciona para a Home
             navigate("/"); 
         } catch (err: any) {
-            // 📌 Se a API retornar erro (401 ou 500, por exemplo)
+            //Se a API retornar erro (401 ou 500, por exemplo)
             setError(err.message || "Erro ao Fazer Login");
         } finally {
             setLoading(false); // encerra estado de carregamento

@@ -1,0 +1,12 @@
+node_modules
+npm-debug.log
+.yarn
+.pnpm-store
+dist
+build
+coverage
+.tmp
+.git
+.vscode
+.DS_Store
+.env

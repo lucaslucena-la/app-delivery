@@ -7,7 +7,9 @@
 		"start": "ts-node src/index.ts",
 		"swagger": "ts-node src/swagger/autogen.ts",
 		"dev": "nodemon src/index.ts",
+		"create:db": "ts-node src/db/create.ts",
 		"serve": "node dist/index.js",
+		"seed": "ts-node src/db/seed.ts",
 		"test": "echo \"Error: no test specified\" && exit 1"
 	},
 	"keywords": [],

@@ -6,7 +6,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
     ports:
-      - "5433:5432"                 # você escolheu a opção B
+      - "5432:5432"             
     volumes:
       - db_data:/var/lib/postgresql/data
     healthcheck:
@@ -40,7 +40,7 @@ services:
       dockerfile: Dockerfile
     environment:
       NODE_ENV: development
-      VITE_API_URL: http://backend:3001
+      VITE_API_URL: http://localhost:3001
 
     volumes:
       - "./app-delivery-frontend:/app"

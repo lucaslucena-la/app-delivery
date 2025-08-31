@@ -31,6 +31,7 @@ export default function Cadastro() {
           Usuário
           <input value={username} onChange={e => setUsername(e.target.value)} placeholder="joao123" />
         </label>
+        
         <label>
           E-mail
           <input value={email} onChange={e => setEmail(e.target.value)} placeholder="email@exemplo.com" />

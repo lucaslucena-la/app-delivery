@@ -9,19 +9,9 @@ export default function Login() {
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
-  async function onSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setError(null);
-    try {
-      const { user } = await loginRequest({ username, password });
-      saveUser(user);
-      navigate("/restaurantes");
-    } catch (err: any) {
-      setError(err?.response?.data?.message || "Falha no login");
-    }
-  }
-
   return (
+
+    //tela inicial de Login
     <div style={{ maxWidth: 360, margin: "4rem auto", padding: 24, border: "1px solid #eee", borderRadius: 12 }}>
       <h2>Login</h2>
       <form onSubmit={onSubmit} style={{ display: "grid", gap: 12 }}>
@@ -38,4 +28,20 @@ export default function Login() {
       </form>
     </div>
   );
+
+  //função de submissão do formulário de login
+  async function onSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setError(null);
+    try {
+      const { user } = await loginRequest({ username, password });
+      saveUser(user);
+      //após o login bem-sucedido vai para a página de restaurantes
+      navigate("/restaurantes");
+    } catch (err: any) {
+      setError(err?.response?.data?.message || "Falha no login");
+    }
+  }
+
+  
 }

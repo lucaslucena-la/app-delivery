@@ -4,6 +4,7 @@ import Login from "./pages/Login";
 import Cadastro from "./pages/Cadastro";
 import Restaurantes from "./pages/Restaurantes";
 import Catalogo from "./pages/Catalogo";
+import CriarRestaurante from "./pages/CriarRestaurante";
 import { getUser, clearUser } from "./store/auth";
 
 export default function App() {
@@ -11,9 +12,9 @@ export default function App() {
 
   return (
     <div>
+      
       <header style={{ padding: 12, borderBottom: "1px solid #eee", display: "flex", gap: 12, alignItems: "center" }}>
         <Link to="/">Home</Link>
-        <Link to="/restaurantes">Restaurantes</Link>
         <div style={{ marginLeft: "auto" }}>
           {user ? (
             <>
@@ -29,12 +30,20 @@ export default function App() {
         </div>
       </header>
 
+      
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={!user ? <Login /> : <Navigate to="/" />} />
         <Route path="/cadastro" element={!user ? <Cadastro /> : <Navigate to="/" />} />
         <Route path="/restaurantes" element={<Restaurantes />} />
         <Route path="/restaurantes/:id" element={<Catalogo />} />
+
+        {/* etapa 2: criar registro na tabela restaurante */}
+        <Route
+          path="/meu-restaurante/criar"
+          element={user ? <CriarRestaurante /> : <Navigate to="/login" />}
+        />
+
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </div>

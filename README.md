@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 
 # Delivery App - Fullstack (Node + React + Postgres)
 
@@ -51,3 +52,6 @@ docker compose exec backend npx ts-node src/db/create.ts
 docker compose exec backend npx ts-node src/db/seed.ts
 ```
 Isso cria as tabelas e popula o banco com usuários, clientes, restaurantes, pratos etc.(Para teste)
+=======
+
+>>>>>>> 487d799 (Rodando redondo com docker)

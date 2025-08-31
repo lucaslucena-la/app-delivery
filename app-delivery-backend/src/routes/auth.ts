@@ -5,7 +5,6 @@ import bcrypt from 'bcrypt';
 const router = Router();
 
 router.post('/login', async (req: Request, res: Response): Promise<any> => {
-  
   /*
     #swagger.tags = ['Auth']
     #swagger.summary = 'Autentica um usuário existente.'
@@ -38,7 +37,6 @@ router.post('/login', async (req: Request, res: Response): Promise<any> => {
       schema: { message: 'Internal server error during login' }
     }
   */
-  
   const { username, password } = req.body;
 
   try {
@@ -55,14 +53,13 @@ router.post('/login', async (req: Request, res: Response): Promise<any> => {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
-    return res.status(200).json({ message: 'Login successful', user: { id: user.id, username: user.usuario, is_restaurante: user.is_restaurante } });
+    return res.status(200).json({ message: 'Login successful', user: { id: user.id_usuario, username: user.usuario, is_restaurante: user.is_restaurante } });
 
   } catch (e) {
     console.error('Error during login:', e);
     return res.status(500).json({ message: 'Internal server error during login' });
   }
 });
-
 
 router.post('/cadastro', async (req: Request, res: Response): Promise<any> => {
   /*

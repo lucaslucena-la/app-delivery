@@ -5,10 +5,10 @@
 	"main": "index.js",
 	"scripts": {
 		"start": "ts-node src/index.ts",
-		"dev": "nodemon --watch src --ext ts,json --exec ts-node src/index.ts",
+		"swagger": "ts-node src/swagger/autogen.ts",
+		"dev": "nodemon src/index.ts",
 		"serve": "node dist/index.js",
-		"test": "echo \"Error: no test specified\" && exit 1",
-		"build": "tsc"
+		"test": "echo \"Error: no test specified\" && exit 1"
 	},
 	"keywords": [],
 	"author": "",
@@ -21,20 +21,20 @@
 		"dotenv": "^16.4.7",
 		"express": "^4.21.2",
 		"jsonwebtoken": "^9.0.2",
-		"pg": "^8.13.1",
-		"swagger-ui-express": "^5.0.1"
+		"pg": "^8.13.1"
 	},
 	"devDependencies": {
 		"@types/bcrypt": "^6.0.0",
 		"@types/cors": "^2.8.19",
 		"@types/express": "^5.0.0",
 		"@types/jsonwebtoken": "^9.0.8",
-		"@types/node": "^22.18.0",
+		"@types/node": "^22.10.10",
 		"@types/pg": "^8.11.11",
 		"@types/swagger-ui-express": "^4.1.8",
 		"nodemon": "^3.1.9",
 		"swagger-autogen": "^2.23.7",
+		"swagger-ui-express": "^5.0.1",
 		"ts-node": "^10.9.2",
-		"typescript": "^5.9.2"
+		"typescript": "^5.7.3"
 	}
 }

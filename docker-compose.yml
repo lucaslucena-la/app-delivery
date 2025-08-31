@@ -18,7 +18,9 @@ services:
   backend:
     build:
       context: "./app-delivery-backend"
-      dockerfile: Dockerfile.dev
+      dockerfile: Dockerfile
+    env_file:
+      - ./app-delivery-backend/.env
     environment:
       NODE_ENV: development
       PORT: 3001
@@ -35,10 +37,11 @@ services:
   frontend:
     build:
       context: "./app-delivery-frontend"
-      dockerfile: Dockerfile.dev
+      dockerfile: Dockerfile
     environment:
       NODE_ENV: development
-      VITE_API_URL: ${VITE_API_URL}
+      VITE_API_URL: http://backend:3001
+
     volumes:
       - "./app-delivery-frontend:/app"
       - /app/node_modules

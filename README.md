@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-
 # Delivery App - Fullstack (Node + React + Postgres)
 
 Este projeto é um sistema de delivery composto por **frontend (React + Vite)**, **backend (Node.js + Express + TypeScript)** e **banco de dados (PostgreSQL)**.

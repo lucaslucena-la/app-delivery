@@ -34,14 +34,15 @@ export default function Login() {
     e.preventDefault();
     setError(null);
     try {
-      const { user } = await loginRequest({ username, password });
-      saveUser(user);
-      //após o login bem-sucedido vai para a página de restaurantes
-      navigate("/restaurantes");
+      const data = await loginRequest({ username, password });
+      saveUser(data.user);  
+      if (data.user.is_restaurante) {
+        navigate("/restaurante/");
+      } else {
+        navigate("/restaurantes");
+      }
     } catch (err: any) {
       setError(err?.response?.data?.message || "Falha no login");
     }
   }
-
-  
 }

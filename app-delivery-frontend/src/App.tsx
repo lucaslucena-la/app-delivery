@@ -4,7 +4,6 @@ import Login from "./pages/Login";
 import Cadastro from "./pages/Cadastro";
 import Restaurantes from "./pages/Restaurantes";
 import Catalogo from "./pages/Catalogo";
-import CriarRestaurante from "./pages/CriarRestaurante";
 import { getUser, clearUser } from "./store/auth";
 
 export default function App() {
@@ -38,11 +37,6 @@ export default function App() {
         <Route path="/restaurantes" element={<Restaurantes />} />
         <Route path="/restaurantes/:id" element={<Catalogo />} />
 
-        {/* etapa 2: criar registro na tabela restaurante */}
-        <Route
-          path="/meu-restaurante/criar"
-          element={user ? <CriarRestaurante /> : <Navigate to="/login" />}
-        />
 
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>

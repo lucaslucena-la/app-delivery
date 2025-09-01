@@ -5,38 +5,7 @@ import bcrypt from 'bcrypt';
 const router = Router();
 
 router.post('/login', async (req: Request, res: Response): Promise<any> => {
-  /*
-    #swagger.tags = ['Auth']
-    #swagger.summary = 'Autentica um usuário existente.'
-    #swagger.parameters['body'] = {
-      in: 'body',
-      description: 'Credenciais do usuário para login.',
-      required: true,
-      schema: {
-        $username: 'joao123',
-        $password: 'senha123'
-      }
-    }
-    #swagger.responses[200] = {
-      description: 'Login bem-sucedido.',
-      schema: {
-        message: 'Login successful',
-        user: {
-          id: 1,
-          username: 'joao123',
-          is_restaurante: false
-        }
-      }
-    }
-    #swagger.responses[401] = {
-      description: 'Credenciais inválidas.',
-      schema: { message: 'Invalid credentials' }
-    }
-    #swagger.responses[500] = {
-      description: 'Erro interno do servidor durante o login.',
-      schema: { message: 'Internal server error during login' }
-    }
-  */
+
   const { username, password } = req.body;
 
   try {
@@ -62,37 +31,7 @@ router.post('/login', async (req: Request, res: Response): Promise<any> => {
 });
 
 router.post('/cadastro', async (req: Request, res: Response): Promise<any> => {
-  /*
-    #swagger.tags = ['Auth']
-    #swagger.summary = 'Registra um novo usuário (cliente ou restaurante).'
-    #swagger.parameters['body'] = {
-      in: 'body',
-      description: 'Dados do usuário para cadastro.',
-      required: true,
-      schema: {
-        $username: 'novo_usuario',
-        $email: 'novo@email.com',
-        $password: 'senha_segura123',
-        $is_restaurante: false
-      }
-    }
-    #swagger.responses[201] = {
-      description: 'Usuário cadastrado com sucesso.',
-      schema: {
-        id: 7,
-        username: 'novo_usuario',
-        is_restaurante: false
-      }
-    }
-    #swagger.responses[400] = {
-      description: 'Dados incompletos para o cadastro do usuário.',
-      schema: { message: 'Todos os campos obrigatorios (username, email, password, is_restaurante) devem ser preenchidos.' }
-    }
-    #swagger.responses[500] = {
-      description: 'Erro interno do servidor durante o cadastro.',
-      schema: { message: 'Internal server error during user registration' }
-    }
-  */
+
   const { username, email, password, is_restaurante } = req.body;
 
   try {
@@ -108,6 +47,15 @@ router.post('/cadastro', async (req: Request, res: Response): Promise<any> => {
     );
 
     const newUser = result.rows[0];
+
+    //Se o usuário for restaurante → cria também na tabela Restaurante
+    if (newUser.is_restaurante) {
+      await pool.query(
+        'INSERT INTO Restaurante (id_usuario, nome, email) VALUES ($1, $2, $3)',
+        [newUser.id_usuario, newUser.usuario, email]
+      );
+    }
+
     return res.status(201).json({ message: 'User registered successfully', user: { id: newUser.id_usuario, username: newUser.usuario, is_restaurante: newUser.is_restaurante } });
 
   } catch (e) {

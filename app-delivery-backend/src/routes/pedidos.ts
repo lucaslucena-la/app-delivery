@@ -4,60 +4,7 @@ import pool from '../db/pool';
 const router = Router();
 
 router.post('/', async (req: Request, res: Response): Promise<any> => {
-  /*
-    #swagger.tags = ['Pedidos']
-    #swagger.summary = 'Cria um novo pedido.'
-    #swagger.parameters['body'] = {
-      in: 'body',
-      description: 'Dados para criar um novo pedido.',
-      required: true,
-      schema: {
-        $id_cliente: 1,
-        $id_restaurante: 1,
-        $forma_pagamento: 'pix',
-        $items: [
-          {
-            $id_prato: 1,
-            $quantidade_item: 1,
-            infos_adicionais: 'Sem cebola'
-          },
-          {
-            $id_prato: 2,
-            $quantidade_item: 2,
-            infos_adicionais: ''
-          }
-        ]
-      }
-    }
-    #swagger.responses[201] = {
-      description: 'Pedido criado com sucesso.',
-      schema: {
-        message: 'Pedido criado com sucesso',
-        pedido: {
-          id_pedido: 5,
-          id_cliente: 1,
-          id_restaurante: 1,
-          data_pedido: '2024-01-01T10:00:00.000Z',
-          status: 'pedido_esperando_ser_aceito',
-          forma_pagamento: 'pix',
-          valor: 8500,
-          taxa: 2550
-        }
-      }
-    }
-    #swagger.responses[400] = {
-      description: 'Dados inválidos ou incompletos.',
-      schema: { message: 'Todos os campos obrigatorios (id_cliente, id_restaurante, forma_pagamento, items) devem ser preenchidos e items nao pode ser vazio.' }
-    }
-    #swagger.responses[404] = {
-      description: 'Prato não encontrado para o restaurante especificado.',
-      schema: { message: 'Prato com ID X nao encontrado para este restaurante.' }
-    }
-    #swagger.responses[500] = {
-      description: 'Erro interno do servidor durante a criação do pedido.',
-      schema: { message: 'Internal server error during order creation' }
-    }
-  */
+  
   const { id_cliente, id_restaurante, forma_pagamento, items } = req.body;
 
   const client = await pool.connect();

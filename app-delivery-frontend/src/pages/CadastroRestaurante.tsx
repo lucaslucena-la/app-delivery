@@ -78,7 +78,7 @@ export default function CadastroRestaurante() {
       </form>
 
       <p style={{ marginTop: 12 }}>
-        Já é parceiro? <Link to="/restaurante/login">Faça o login aqui</Link>
+        Já é parceiro? <Link to="/login">Faça o login aqui</Link>
       </p>
     </div>
   );

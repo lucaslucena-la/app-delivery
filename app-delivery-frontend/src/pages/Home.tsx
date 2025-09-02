@@ -15,11 +15,6 @@ export default function Home() {
 
       <div style={{ display: "flex", gap: 12, marginTop: 12 }}>
         <Link to="/restaurantes">Ver Restaurantes</Link>
-        {user && (
-          <button onClick={() => { clearUser(); location.href = "/"; }}>
-            Sair ({user.username})
-          </button>
-        )}
       </div>
     </div>
   );

@@ -24,10 +24,12 @@ router.post('/login', async (req: Request, res: Response): Promise<any> => {
 
     return res.status(200).json({ message: 'Login successful', user: { id: user.id_usuario, username: user.usuario, is_restaurante: user.is_restaurante } });
 
-  } catch (e) {
+  
+  } catch (e: any) {
     console.error('Error during login:', e);
     return res.status(500).json({ message: 'Internal server error during login' });
   }
+
 });
 
 router.post('/cadastro', async (req: Request, res: Response): Promise<any> => {
@@ -59,10 +61,17 @@ router.post('/cadastro', async (req: Request, res: Response): Promise<any> => {
 
     return res.status(201).json({ message: 'User registered successfully', user: { id: newUser.id_usuario, username: newUser.usuario, is_restaurante: newUser.is_restaurante } });
 
-  } catch (e) {
+  // CADASTRO
+  } catch (e: any) {
     console.error('Error during user registration:', e);
+
+    if (e.code === '23505') {
+      return res.status(400).json({ message: 'Usuário ou email já cadastrado.' });
+    }
+
     return res.status(500).json({ message: 'Internal server error during user registration' });
   }
+
 });
 
 export default router;

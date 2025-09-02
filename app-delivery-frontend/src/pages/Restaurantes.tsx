@@ -13,7 +13,7 @@ export default function Restaurantes() {
     });
   }, []);
 
-  if (error) return <p style={{ color: "crimson" }}>{error}</p>;
+  if (error) return <p style={{ color: "crimson" }}>{error}</p>; 
   if (!data.length) return <p style={{ padding: 24 }}>Carregando...</p>;
 
   return (

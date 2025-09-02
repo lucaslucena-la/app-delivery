@@ -1,68 +1,82 @@
+/* 1. Importando uma fonte limpa para a aplicação */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
+
+/* 2. Definindo variáveis globais (Custom Properties) para consistência */
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+  --cor-primaria: #4f46e5;
+  --cor-primaria-hover: #4338ca;
+  --cor-texto-principal: #1f2937;
+  --cor-texto-secundario: #6b7280;
+  --cor-fundo: #f9fafb;
+  --cor-borda: #e5e7eb;
+  --cor-sucesso: #10b981;
+  --cor-erro: #ef4444;
+  --sombra-card: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --raio-borda: 8px;
+}
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+/* 3. Reset básico e estilos para o corpo (body) */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--cor-fundo);
+  color: var(--cor-texto-principal);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* 4. Estilos padrão para elementos comuns */
 a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
+  color: var(--cor-primaria);
+  text-decoration: none;
+  transition: color 0.2s;
 }
+
 a:hover {
-  color: #535bf2;
-}
-
-body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
-}
-
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+  text-decoration: underline;
+  color: var(--cor-primaria-hover);
 }
 
 button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
   cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+  border: none;
+  padding: 10px 18px;
+  border-radius: var(--raio-borda);
+  background-color: var(--cor-primaria);
+  color: white;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: background-color 0.2s;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+button:hover {
+  background-color: var(--cor-primaria-hover);
 }
+
+input {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: var(--raio-borda);
+  border: 1px solid var(--cor-borda);
+  font-size: 1rem;
+  font-family: 'Inter', sans-serif;
+}
+
+input:focus {
+  outline: 2px solid var(--cor-primaria);
+  border-color: transparent;
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-weight: 500;
+}
+
+

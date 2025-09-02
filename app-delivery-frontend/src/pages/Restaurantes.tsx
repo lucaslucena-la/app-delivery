@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { listarRestaurantes } from "../services/restaurante";
-import type { Restaurante } from "../services/restaurante"; // <- tipo
-import { Link } from "react-router-dom";
+import type { Restaurante } from "../services/restaurante"; 
+import RestauranteCard from "../components/RestauranteCard";
 
 export default function Restaurantes() {
   const [data, setData] = useState<Restaurante[]>([]);
@@ -18,12 +18,10 @@ export default function Restaurantes() {
 
   return (
     <div style={{ maxWidth: 800, margin: "2rem auto", padding: 16 }}>
-      <h2>Restaurantes</h2>
+      <h2>Restaurantes Disponíveis</h2>
       <ul>
         {data.map(r => (
-          <li key={r.id_restaurante} style={{ marginBottom: 8 }}>
-            <Link to={`/restaurantes/${r.id_restaurante}`}>{r.nome}</Link>
-          </li>
+          <RestauranteCard key={r.id_restaurante} restaurante={r} />
         ))}
       </ul>
     </div>

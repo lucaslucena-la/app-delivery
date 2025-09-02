@@ -32,7 +32,7 @@ router.post('/login', async (req: Request, res: Response): Promise<any> => {
 
 router.post('/cadastro', async (req: Request, res: Response): Promise<any> => {
 
-  const { username, email, password, is_restaurante } = req.body;
+  const { username, email, password, is_restaurante, endereco, telefone } = req.body;
 
   try {
     if (!username || !email || !password || is_restaurante === undefined) {
@@ -48,11 +48,12 @@ router.post('/cadastro', async (req: Request, res: Response): Promise<any> => {
 
     const newUser = result.rows[0];
 
-    //Se o usuário for restaurante → cria também na tabela Restaurante
+    // Se o usuário for restaurante → cria também na tabela Restaurante
     if (newUser.is_restaurante) {
+      // 2. Adicionamos os novos campos ao comando SQL INSERT
       await pool.query(
-        'INSERT INTO Restaurante (id_usuario, nome, email) VALUES ($1, $2, $3)',
-        [newUser.id_usuario, newUser.usuario, email]
+        'INSERT INTO Restaurante (id_usuario, nome, email, endereco, telefone) VALUES ($1, $2, $3, $4, $5)',
+        [newUser.id_usuario, newUser.usuario, email, endereco, telefone] // <-- Passando os novos valores
       );
     }
 

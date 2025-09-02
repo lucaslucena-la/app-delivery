@@ -19,6 +19,8 @@ export async function registerRequest(payload: {
   email: string;
   password: string;
   is_restaurante: boolean;
+  endereco?: string;
+  telefone?: string;
 }) {
   const { data } = await api.post("/auth/cadastro", payload);
   return data; // retorna a resposta da API (pode ser mensagem ou user criado)

@@ -23,7 +23,8 @@
 		"dotenv": "^16.4.7",
 		"express": "^4.21.2",
 		"jsonwebtoken": "^9.0.2",
-		"pg": "^8.13.1"
+		"pg": "^8.13.1",
+		"swagger-jsdoc": "^6.2.8"
 	},
 	"devDependencies": {
 		"@types/bcrypt": "^6.0.0",

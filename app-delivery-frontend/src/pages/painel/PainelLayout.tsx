@@ -1,62 +1,86 @@
 import { Link, Outlet, useLocation } from "react-router-dom";
+import { useState } from "react"; // Importar useState
+import styles from './PainelLayout.module.css';
 
-// Estilos para o layout (pode ser movido para um .module.css depois)
-const layoutStyle: React.CSSProperties = {
-  display: 'flex',
-  minHeight: '100vh'
-};
-
-const sidebarStyle: React.CSSProperties = {
-  width: '250px',
-  backgroundColor: '#1f2937', // Um cinza escuro
-  color: 'white',
-  padding: '1.5rem',
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '1rem'
-};
-
-const mainContentStyle: React.CSSProperties = {
-  flex: 1,
-  padding: '2rem',
-  backgroundColor: '#f9fafb' // Fundo claro para o conteúdo
-};
-
-const navLinkStyle: React.CSSProperties = {
-  color: '#d1d5db', // Cinza claro
-  textDecoration: 'none',
-  padding: '10px 15px',
-  borderRadius: '8px',
-  transition: 'background-color 0.2s, color 0.2s'
-};
-
-const activeLinkStyle: React.CSSProperties = {
-  ...navLinkStyle,
-  backgroundColor: '#4f46e5', // Cor primária para o link ativo
-  color: 'white',
-  fontWeight: 'bold'
-};
+// import { FaBars, FaTachometerAlt, FaShoppingCart, FaUtensils, FaCog } from 'react-icons/fa';
 
 export default function PainelLayout() {
   const location = useLocation();
+  const [isExpanded, setIsExpanded] = useState(false); // Estado para controlar a expansão
 
   // Função para verificar se o link está ativo
   const isLinkActive = (path: string) => location.pathname === path;
 
+  // Handler para passar o mouse sobre o sidebar
+  const handleMouseEnter = () => {
+    setIsExpanded(true);
+  };
+
+  // Handler para tirar o mouse do sidebar
+  const handleMouseLeave = () => {
+    setIsExpanded(false);
+  };
+
+  // Handler para clique no botão de toggle (opcional, se quiser um clique também)
+  const handleToggleClick = () => {
+    setIsExpanded(prev => !prev);
+  };
+
   return (
-    <div style={layoutStyle}>
-      <aside style={sidebarStyle}>
-        <h2 style={{ textAlign: 'center', marginBottom: '2rem' }}>Painel do Parceiro</h2>
-        <nav style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-          <Link to="/painel/dashboard" style={isLinkActive('/painel/dashboard') ? activeLinkStyle : navLinkStyle}>Visão Geral</Link>
-          <Link to="/painel/pedidos" style={isLinkActive('/painel/pedidos') ? activeLinkStyle : navLinkStyle}>Gerenciar Pedidos</Link>
-          <Link to="/painel/cardapio" style={isLinkActive('/painel/cardapio') ? activeLinkStyle : navLinkStyle}>Gerenciar Cardápio</Link>
-          <Link to="/painel/configuracoes" style={isLinkActive('/painel/configuracoes') ? activeLinkStyle : navLinkStyle}>Configurações</Link>
+    <div className={styles.layout}>
+      {/* Adicionar onMouseEnter e onMouseLeave ao aside */}
+      <aside 
+        className={`${styles.sidebar} ${isExpanded ? styles.sidebarExpanded : ''}`}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+      >
+        {/* Botão de toggle para controle por clique (opcional) */}
+        <button className={styles.menuToggle} onClick={handleToggleClick}>
+          ☰ {/* Ícone de menu (pode ser substituído por <FaBars />) */}
+        </button>
+
+        {/* O título agora tem estilização condicional via CSS */
+          isExpanded && <h2>Painel do Parceiro</h2>
+        }
+
+        <nav>
+          <Link 
+            to="/painel/dashboard" 
+            className={`${styles.navLink} ${isLinkActive('/painel/dashboard') ? styles.active : ''}`}
+          >
+            <span className={styles.navIcon}>📊</span> {/* Ícone */}
+            <span className={styles.navLinkText}>Visão Geral</span>
+          </Link>
+
+          <Link 
+            to="/painel/pedidos" 
+            className={`${styles.navLink} ${isLinkActive('/painel/pedidos') ? styles.active : ''}`}
+          >
+            <span className={styles.navIcon}>🛒</span> {/* Ícone */}
+            <span className={styles.navLinkText}>Gerenciar Pedidos</span>
+          </Link>
+
+          <Link 
+            to="/painel/cardapio" 
+            className={`${styles.navLink} ${isLinkActive('/painel/cardapio') ? styles.active : ''}`}
+          >
+            <span className={styles.navIcon}>🍽️</span> {/* Ícone */}
+            <span className={styles.navLinkText}>Gerenciar Cardápio</span>
+          </Link>
+
+          <Link 
+            to="/painel/configuracoes" 
+            className={`${styles.navLink} ${isLinkActive('/painel/configuracoes') ? styles.active : ''}`}
+          >
+            <span className={styles.navIcon}>⚙️</span> {/* Ícone */}
+            <span className={styles.navLinkText}>Configurações</span>
+          </Link>
+          
           {/* TODO: Adicionar links para Avaliações e Financeiro */}
         </nav>
       </aside>
-      <main style={mainContentStyle}>
-        {/* O Outlet renderiza o componente da rota filha (Dashboard, Pedidos, etc.) */}
+
+      <main className={styles.mainContent}>
         <Outlet />
       </main>
     </div>

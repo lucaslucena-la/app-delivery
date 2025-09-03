@@ -19,7 +19,7 @@ app.use('/', swagger)
 app.use('/auth', auth);
 app.use('/restaurante', restaurante);
 app.use('/pagamento', pagamento);
-app.use('/pedido', pedidos);
+app.use('/pedidos', pedidos);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

@@ -2,7 +2,7 @@
   "swagger": "2.0",
   "info": {
     "title": "API delivery",
-    "description": "",
+    "description": "Documentação da API",
     "version": "1.0.0"
   },
   "host": "localhost:3001",
@@ -11,52 +11,807 @@
     "http"
   ],
   "paths": {
-    "/docs": {
-      "get": {
+    "/auth/login": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Autentica um usuário existente.",
         "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "description": "Credenciais do usuário para login.",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "username": {
+                  "type": "string",
+                  "example": "joao123"
+                },
+                "password": {
+                  "type": "string",
+                  "example": "senha123"
+                }
+              },
+              "required": [
+                "username",
+                "password"
+              ]
+            }
+          }
+        ],
         "responses": {
-          "default": {
-            "description": ""
+          "200": {
+            "description": "Login bem-sucedido.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Login successful"
+                },
+                "user": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "number",
+                      "example": 1
+                    },
+                    "username": {
+                      "type": "string",
+                      "example": "joao123"
+                    },
+                    "is_restaurante": {
+                      "type": "boolean",
+                      "example": false
+                    }
+                  }
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "401": {
+            "description": "Credenciais inválidas.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Invalid credentials"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno do servidor durante o login.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Internal server error during login"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           }
         }
       }
     },
-    "/login/": {
+    "/auth/cadastro": {
       "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Registra um novo usuário (cliente ou restaurante).",
         "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "description": "Dados do usuário para cadastro.",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "username": {
+                  "type": "string",
+                  "example": "novo_usuario"
+                },
+                "email": {
+                  "type": "string",
+                  "example": "novo@email.com"
+                },
+                "password": {
+                  "type": "string",
+                  "example": "senha_segura123"
+                },
+                "is_restaurante": {
+                  "type": "boolean",
+                  "example": false
+                }
+              },
+              "required": [
+                "username",
+                "email",
+                "password",
+                "is_restaurante"
+              ]
+            }
+          }
+        ],
         "responses": {
-          "default": {
-            "description": ""
+          "201": {
+            "description": "Usuário cadastrado com sucesso.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "number",
+                  "example": 7
+                },
+                "username": {
+                  "type": "string",
+                  "example": "novo_usuario"
+                },
+                "is_restaurante": {
+                  "type": "boolean",
+                  "example": false
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "400": {
+            "description": "Dados incompletos para o cadastro do usuário.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Todos os campos obrigatorios (username, email, password, is_restaurante) devem ser preenchidos."
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno do servidor durante o cadastro.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Internal server error during user registration"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           }
         }
       }
     },
     "/restaurante/": {
       "get": {
+        "tags": [
+          "Restaurante"
+        ],
+        "summary": "Retorna todos os restaurantes cadastrados.",
         "description": "",
         "responses": {
-          "default": {
-            "description": ""
+          "200": {
+            "description": "Lista de restaurantes.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id_restaurante": {
+                    "type": "number",
+                    "example": 1
+                  },
+                  "nome": {
+                    "type": "string",
+                    "example": "Pizza Palace"
+                  },
+                  "email": {
+                    "type": "string",
+                    "example": "contato@pizzapalace.com"
+                  },
+                  "endereco": {
+                    "type": "string",
+                    "example": "Rua das Pizzas, 123"
+                  },
+                  "telefone": {
+                    "type": "string",
+                    "example": "11444555666"
+                  },
+                  "id_usuario": {
+                    "type": "number",
+                    "example": 3
+                  }
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "404": {
+            "description": "Nenhum restaurante foi encontrado.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Nenhum restaurante foi encontrado."
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno do servidor.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Internal server error"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           }
         }
       }
     },
     "/restaurante/catalogo": {
       "get": {
+        "tags": [
+          "Restaurante"
+        ],
+        "summary": "Retorna o catálogo de pratos de um restaurante específico.",
         "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "description": "ID do restaurante",
+            "required": true,
+            "type": "integer",
+            "example": 1
+          }
+        ],
         "responses": {
-          "default": {
-            "description": ""
+          "200": {
+            "description": "Catálogo de pratos do restaurante.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id_prato": {
+                    "type": "number",
+                    "example": 1
+                  },
+                  "id_restaurante": {
+                    "type": "number",
+                    "example": 1
+                  },
+                  "nome": {
+                    "type": "string",
+                    "example": "Pizza Margherita"
+                  },
+                  "descricao": {
+                    "type": "string",
+                    "example": "Pizza tradicional com molho de tomate, mussarela e manjericão"
+                  },
+                  "valor": {
+                    "type": "number",
+                    "example": 3500
+                  },
+                  "estoque": {
+                    "type": "number",
+                    "example": 50
+                  },
+                  "id_categoria": {
+                    "type": "number",
+                    "example": 6
+                  }
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "400": {
+            "description": "ID do restaurante não fornecido.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Id eh necessario para requisitar o catalogo do resturante."
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "404": {
+            "description": "Restaurante nao tem nenhum prato cadastrado.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Restaurante nao tem nenhum prato cadastrado."
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno do servidor.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Internal server error"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           }
         }
       }
     },
-    "/pagamento/pagamento": {
+    "/restaurante/prato": {
       "post": {
+        "tags": [
+          "Restaurante"
+        ],
+        "summary": "Cadastra um novo prato para um restaurante.",
         "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "description": "Dados do prato para cadastro.",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id_restaurante": {
+                  "type": "number",
+                  "example": 1
+                },
+                "nome": {
+                  "type": "string",
+                  "example": "Pizza Calabresa"
+                },
+                "descricao": {
+                  "type": "string",
+                  "example": "Pizza com molho de tomate, mussarela e calabresa"
+                },
+                "valor": {
+                  "type": "number",
+                  "example": 4000
+                },
+                "estoque": {
+                  "type": "number",
+                  "example": 100
+                },
+                "id_categoria": {
+                  "type": "number",
+                  "example": 6
+                }
+              },
+              "required": [
+                "id_restaurante",
+                "nome",
+                "descricao",
+                "valor",
+                "estoque",
+                "id_categoria"
+              ]
+            }
+          }
+        ],
         "responses": {
-          "default": {
-            "description": ""
+          "201": {
+            "description": "Prato cadastrado com sucesso.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id_prato": {
+                  "type": "number",
+                  "example": 10
+                },
+                "id_restaurante": {
+                  "type": "number",
+                  "example": 1
+                },
+                "nome": {
+                  "type": "string",
+                  "example": "Pizza Calabresa"
+                },
+                "descricao": {
+                  "type": "string",
+                  "example": "Pizza com molho de tomate, mussarela e calabresa"
+                },
+                "valor": {
+                  "type": "number",
+                  "example": 4000
+                },
+                "estoque": {
+                  "type": "number",
+                  "example": 100
+                },
+                "id_categoria": {
+                  "type": "number",
+                  "example": 6
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "400": {
+            "description": "Dados incompletos para o cadastro do prato.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Todos os campos obrigatorios (id_restaurante, nome, descricao, valor, estoque, id_categoria) devem ser preenchidos."
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno do servidor durante o cadastro do prato.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Internal server error"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/pagamento/": {
+      "post": {
+        "tags": [
+          "Pagamento"
+        ],
+        "summary": "Processa o pagamento no final de um pedido.",
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "description": "Dados do pagamento do pedido.",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id_pedido": {
+                  "type": "number",
+                  "example": 1
+                },
+                "forma_pagamento": {
+                  "type": "string",
+                  "example": "credito"
+                }
+              },
+              "required": [
+                "id_pedido",
+                "forma_pagamento"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Pagamento processado com sucesso.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Pagamento processado com sucesso."
+                },
+                "pedido": {
+                  "type": "object",
+                  "properties": {
+                    "id_pedido": {
+                      "type": "number",
+                      "example": 1
+                    },
+                    "id_cliente": {
+                      "type": "number",
+                      "example": 1
+                    },
+                    "id_restaurante": {
+                      "type": "number",
+                      "example": 1
+                    },
+                    "data_pedido": {
+                      "type": "string",
+                      "example": "2024-01-15T19:30:00.000Z"
+                    },
+                    "status": {
+                      "type": "string",
+                      "example": "completo"
+                    },
+                    "forma_pagamento": {
+                      "type": "string",
+                      "example": "credito"
+                    },
+                    "valor": {
+                      "type": "number",
+                      "example": 4500
+                    },
+                    "taxa": {
+                      "type": "number",
+                      "example": 1350
+                    }
+                  }
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "400": {
+            "description": "Dados incompletos para processar o pagamento.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "id_pedido e forma_pagamento sao obrigatorios."
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "404": {
+            "description": "Pedido nao encontrado.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Pedido nao encontrado."
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno do servidor durante o processamento do pagamento.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Internal server error during payment processing"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/pedidos/": {
+      "post": {
+        "tags": [
+          "Pedidos"
+        ],
+        "summary": "Cria um novo pedido.",
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "description": "Dados para criar um novo pedido.",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id_cliente": {
+                  "type": "number",
+                  "example": 1
+                },
+                "id_restaurante": {
+                  "type": "number",
+                  "example": 1
+                },
+                "forma_pagamento": {
+                  "type": "string",
+                  "example": "pix"
+                },
+                "items": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id_prato": {
+                        "type": "number",
+                        "example": 2
+                      },
+                      "quantidade_item": {
+                        "type": "number",
+                        "example": 2
+                      },
+                      "infos_adicionais": {
+                        "type": "string",
+                        "example": ""
+                      }
+                    },
+                    "required": [
+                      "id_prato",
+                      "quantidade_item"
+                    ]
+                  }
+                }
+              },
+              "required": [
+                "id_cliente",
+                "id_restaurante",
+                "forma_pagamento",
+                "items"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Pedido criado com sucesso.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Pedido criado com sucesso"
+                },
+                "pedido": {
+                  "type": "object",
+                  "properties": {
+                    "id_pedido": {
+                      "type": "number",
+                      "example": 5
+                    },
+                    "id_cliente": {
+                      "type": "number",
+                      "example": 1
+                    },
+                    "id_restaurante": {
+                      "type": "number",
+                      "example": 1
+                    },
+                    "data_pedido": {
+                      "type": "string",
+                      "example": "2024-01-01T10:00:00.000Z"
+                    },
+                    "status": {
+                      "type": "string",
+                      "example": "pedido_esperando_ser_aceito"
+                    },
+                    "forma_pagamento": {
+                      "type": "string",
+                      "example": "pix"
+                    },
+                    "valor": {
+                      "type": "number",
+                      "example": 8500
+                    },
+                    "taxa": {
+                      "type": "number",
+                      "example": 2550
+                    }
+                  }
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "400": {
+            "description": "Dados inválidos ou incompletos.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Todos os campos obrigatorios (id_cliente, id_restaurante, forma_pagamento, items) devem ser preenchidos e items nao pode ser vazio."
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "404": {
+            "description": "Prato não encontrado para o restaurante especificado.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Prato com ID X nao encontrado para este restaurante."
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno do servidor durante a criação do pedido.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Internal server error during order creation"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           }
         }
       }

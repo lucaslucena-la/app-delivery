@@ -1,0 +1,144 @@
+/* PainelLayout.module.css */
+
+.layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+.sidebar {
+  width: 70px;
+  background-color: #1f2937;
+  color: white;
+  /* Padding original: padding: 1rem 0.5rem; */
+  /* NOVO padding: Adiciona mais espaço no topo */
+  padding: 4rem 0.5rem 1rem 0.5rem; /* topo, laterais, baixo */
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  transition: width 0.6s ease-in-out;
+  overflow: hidden;
+  position: relative;
+}
+
+.sidebarExpanded {
+  width: 250px;
+  /* Ajuste o padding para o estado expandido também */
+  padding: 4rem 1.5rem 1.5rem 1.5rem;
+}
+
+/* Esconder o título quando recolhido */
+.sidebar h2 {
+  text-align: center;
+  margin-bottom: 1.5rem; /* Ajuste para o estado recolhido */
+  opacity: 1;
+  transition: opacity 0.3s ease-in-out;
+  white-space: nowrap; /* Impede que o texto quebre */
+}
+
+.sidebarExpanded h2 {
+  margin-bottom: 2rem; /* Padding original */
+}
+
+.sidebar:not(.sidebarExpanded) h2 {
+  opacity: 0; /* Esconde o título quando não expandido */
+  height: 0; /* Colapsa o espaço do título */
+  margin-bottom: 0; /* Remove a margem também */
+  visibility: hidden; /* Garante que não seja selecionável */
+}
+
+
+.sidebar nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* Estilo para o texto dos links (esconder quando recolhido) */
+.navLinkText {
+  white-space: nowrap; /* Impede a quebra de linha */
+  opacity: 1;
+  transition: opacity 0.3s ease-in-out;
+  margin-left: 0.5rem; /* Espaço entre o ícone e o texto */
+}
+
+.sidebar:not(.sidebarExpanded) .navLinkText {
+  opacity: 0; /* Esconde o texto dos links quando não expandido */
+  width: 0;
+  overflow: hidden;
+  visibility: hidden; /* Garante que não seja selecionável */
+}
+
+/* Ajustes para o link em si para acomodar o ícone e o texto */
+.navLink {
+  color: #d1d5db;
+  text-decoration: none;
+  padding: 10px 15px;
+  border-radius: 8px;
+  transition: background-color 0.2s, color 0.2s;
+  display: flex; /* Para alinhar ícone e texto */
+  align-items: center; /* Alinha verticalmente */
+}
+
+.active {
+  background-color: #4f46e5;
+  color: white;
+  font-weight: bold;
+}
+
+.navLink:hover:not(.active) {
+  background-color: #374151;
+  color: white;
+}
+
+/* Adicionando um estilo para o botão de toggle do menu */
+.menuToggle {
+  position: absolute;
+  top: 1rem;
+  right: 1rem; /* Ajuste a posição conforme necessário */
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+  z-index: 10;
+  display: flex; /* Para centralizar o ícone */
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+}
+
+.menuToggle:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Estilo para o ícone que pode ser usado nos links (ex: FontAwesome ou ícones simples) */
+.navIcon {
+  font-size: 1.2rem; /* Tamanho do ícone */
+  min-width: 24px; /* Garante que o ícone tenha um espaço mínimo */
+  text-align: center;
+}
+
+/* Centraliza os ícones quando o menu está recolhido */
+.sidebar:not(.sidebarExpanded) .navLink {
+  justify-content: center; /* Centraliza o ícone */
+  padding: 10px 0; /* Remove padding horizontal quando recolhido */
+}
+
+.sidebar:not(.sidebarExpanded) h2 {
+  opacity: 0;
+  height: 0;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+
+/* Ajustes para o main content */
+.mainContent {
+  flex: 1;
+  padding: 2rem;
+  background-color: #f9fafb;
+}

@@ -1,5 +1,5 @@
 import { useState } from "react"; // 1. Importamos o useState
-import { Routes, Route, Navigate, Link } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 
 
 
@@ -20,7 +20,7 @@ import ClienteLayout from './pages/cliente/ClienteLayout';
 
 import Dashboard from './pages/painel/Dashboard';
 import ProtectedRoute from "./components/ProtectedRoute";
-import { getUser, clearUser } from "./store/auth";
+import { getUser} from "./store/auth";
 
 export default function App() {
   const [user, setUser] = useState(getUser());

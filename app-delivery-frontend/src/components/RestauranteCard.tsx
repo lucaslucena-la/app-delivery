@@ -1,26 +1,23 @@
 import { Link } from "react-router-dom";
 import type { Restaurante } from "../services/restaurante";
+import Card from "react-bootstrap/Card";
+import Button from "react-bootstrap/Button";
 
-import styles from "./RestauranteCard.module.css";
-
-
-// Neste caso, ele espera um objeto chamado 'restaurante' do tipo 'Restaurante'.
 type Props = {
   restaurante: Restaurante;
 };
 
-// Este componente tem uma única responsabilidade: exibir os dados de um restaurante.
 export default function RestauranteCard({ restaurante }: Props) {
   return (
-
-    <Link
-          to={`/restaurantes/${restaurante.id_restaurante}`}
-          className={styles.cardLink}
-      >
-
-      <h2 className={styles.title}>{restaurante.nome}</h2>
-      <p className={styles.address}>{restaurante.endereco}</p>
+    <Link to={`/restaurantes/${restaurante.id_restaurante}`} style={{ textDecoration: "none" }}>
+      <Card style={{ width: "18rem", cursor: "pointer" }} className="mb-3 shadow-sm">
+      <Card.Img style={{ objectFit: "cover", height: "12rem" }} variant="top" src={`/images/card.png`} />
+      <Card.Body>
+        <Card.Title>{restaurante.nome}</Card.Title>
+        <Card.Text>{restaurante.endereco}</Card.Text>
+        <Button style={{ backgroundColor: "#060000ff", borderColor: "#0c0101ff" }}>Ver cardápio</Button>
+      </Card.Body>
+      </Card>
     </Link>
   );
 }
-

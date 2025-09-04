@@ -1,0 +1,155 @@
+:root{
+  --fg:#0e0f14;
+  --muted:#6b7280;
+  --surface:#ffffff;
+  --rose:#e11d48;
+  --shadow:0 10px 30px rgba(15,23,42,.12);
+}
+
+/* ===== HERO BASE ===== */
+.heroSection {
+  background-size: cover;
+  min-height: 100vh;  
+  position: relative;   
+}
+
+.overlay {
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+}
+
+.floatingNavbar {
+  position: absolute;
+  width: 100%;
+  top: 0;
+  left: 0;
+  z-index: 10; 
+}
+.floatingNavbar :global(.nav-link) {
+  color: rgba(0, 0, 0, 0.9) !important; 
+  font-weight: 500; 
+  transition: color 0.2s ease-in-out; 
+}
+.floatingNavbar :global(.nav-link:hover) {
+  color: #cb0505 !important; 
+  text-decoration: none;
+}
+.floatingNavbar :global(.navbar-brand) { font-weight: 600;  color: #ff0000;}
+.floatingNavbar a:hover { text-decoration: none; }
+
+/* ====== HERO GRID (painel esquerda | conteúdo direita) ====== */
+.heroGrid{
+  display: grid;
+  grid-template-columns: 1.05fr 1fr;
+  min-height: 93vh;;
+}
+
+/* Painel lateral ESQUERDA (somente imagem) */
+.leftPanel{
+  position: relative;
+  background-image: url("https://images.unsplash.com/photo-1550547660-d9450f859349?q=80&w=1600&auto=format&fit=crop");
+  background-size: cover;
+  background-position: center;
+}
+
+/* Conteúdo DIREITA */
+.rightContent{
+  position: relative;
+  background: linear-gradient(180deg, #fff, #fff7f7);
+  padding: clamp(32px, 6vw, 72px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  /* --- NOVO --- */
+  background-image: url("/images/fundohome.png");
+  background-repeat: no-repeat;
+  background-position: bottom right; /* controla onde aparece */
+  background-size: 420px auto;       /* ajuste o tamanho */
+}
+
+/* Títulos / textos */
+.title{
+  font-size: clamp(32px, 4.6vw, 56px);
+  line-height: 1.05;
+  margin: 0 0 10px 0;
+  color: var(--fg);
+}
+.subtitle{
+  color: var(--muted);
+  font-size: clamp(16px, 1.6vw, 20px);
+  margin: 0 0 24px 0;
+}
+
+/* Busca (input + botão) */
+.search{
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+.select{
+  position: relative;
+  flex: 1 1 280px;
+}
+.select input{
+  width: 100%;
+  height: 48px;
+  border-radius: 12px;
+  border: 1.2px solid #e5e7eb;
+  padding: 0 44px 0 14px;
+  outline: none;
+  background: #fff;
+  font-size: 16px;
+}
+.select input::placeholder{ color:#9ca3af; }
+.chevron{
+  position: absolute;
+  right: 12px; top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none; color:#9ca3af;
+}
+
+.primaryBtn{
+  height: 48px;
+  padding: 0 18px;
+  border: none;
+  border-radius: 12px;
+  background: var(--rose);
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+}
+.primaryBtn:hover{ filter: brightness(0.95); }
+
+/* Link parceiro */
+.partner{ color:#111827; margin-top: 6px; }
+.partnerLink{
+  color:#ff2d2d;
+  font-weight: 700;
+  text-decoration: none;
+}
+.partnerLink:hover{ text-decoration: underline; }
+
+.heroContent {
+  position: relative; 
+  z-index: 2; 
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;  
+  height: 100%; 
+  min-height: 70vh;
+}
+
+/* ===== Seção genérica abaixo do hero ===== */
+.contentSection { padding: 3rem 1rem; }
+
+/* ===== Responsivo ===== */
+@media (max-width: 980px){
+  .heroGrid{ grid-template-columns: 1fr; }
+  .leftPanel{ height: 38vh; }
+}

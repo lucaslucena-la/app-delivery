@@ -13,14 +13,14 @@ type Props = {
 export default function RestauranteCard({ restaurante }: Props) {
   return (
 
-      <Link
-            to={`/restaurantes/${restaurante.id_restaurante}`}
-            className={styles.cardLink}
-        >
+    <Link
+          to={`/restaurantes/${restaurante.id_restaurante}`}
+          className={styles.cardLink}
+      >
 
-        <h2 className={styles.title}>{restaurante.nome}</h2>
-        <p className={styles.address}>{restaurante.endereco}</p>
-      </Link>
+      <h2 className={styles.title}>{restaurante.nome}</h2>
+      <p className={styles.address}>{restaurante.endereco}</p>
+    </Link>
   );
 }
 

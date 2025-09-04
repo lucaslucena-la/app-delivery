@@ -1,7 +1,7 @@
 /* Este arquivo de estilo afeta APENAS o componente RestauranteCard.tsx */
 
 .cardLink {
-  display: block; /* Faz o link preencher todo o card */
+  display: block; 
   text-decoration: none;
   color: inherit;
   background-color: white;

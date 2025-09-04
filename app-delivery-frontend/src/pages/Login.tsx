@@ -3,6 +3,10 @@ import { useNavigate, Link } from "react-router-dom";
 import { loginRequest } from "../services/auth";
 import { saveUser } from "../store/auth";
 
+
+import { getUser, clearUser } from "../store/auth";
+
+
 // 1. Definimos o tipo das "props" que o componente espera receber.
 //    Neste caso, ele espera uma função chamada 'onLoginSuccess'.
 type LoginProps = {
@@ -32,7 +36,6 @@ export default function Login({ onLoginSuccess }: LoginProps) {
 
         onLoginSuccess();
 
-        
       }
     } catch(err: any) {
       // Corrigi um pequeno erro de digitação aqui (era 'reponse')
@@ -42,9 +45,38 @@ export default function Login({ onLoginSuccess }: LoginProps) {
     }
   };
 
+  const [user, setUser] = useState(getUser());
+    
+    const handleLogout = () => {
+      clearUser();
+      setUser(null);
+    };
+
   return (
-    // Seu JSX do formulário continua exatamente o mesmo
+
+    
     <div>
+
+      <header style={{ padding: 12, borderBottom: "1px solid #eee", display: "flex", gap: 12, alignItems: "center" }}>
+        <Link to="/">Home</Link>
+        <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: '16px' }}>
+          
+          {user ? (
+            <>
+              <span style={{ marginRight: 8 }}>Olá, {user.username}</span>
+              <button onClick={handleLogout}>Sair</button>
+            </>
+          ) : (
+            <>
+              <Link to="/login" style={{ marginRight: 8 }}>Login</Link>
+              <Link to="/cadastro">Cadastro Cliente</Link>
+              <span style={{ borderLeft: '1px solid #ccc', height: '20px' }}></span>
+              <Link to="/cadastro-restaurante">Seja um Parceiro</Link>
+            </>
+          )}
+        </div>
+      </header>
+
       <div style={{ maxWidth: 360, margin: "4rem auto", padding: 24, border: "1px solid #eee", borderRadius: 12 }}>
         <h2 style={{ textAlign: 'center', marginBottom: '24px' }}>Acessar minha conta</h2>
         <form onSubmit={onSubmit} style={{ display: "grid", gap: 12 }}>

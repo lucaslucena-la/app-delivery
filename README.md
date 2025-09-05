@@ -5,13 +5,13 @@ Todo o ambiente roda em **containers Docker** usando `docker-compose`.
 
 ---
 
-## 🚀 Pré-requisitos
+## Pré-requisitos
 
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/) instalado e rodando
 - [Node.js](https://nodejs.org/) **(opcional, apenas se quiser rodar fora do Docker)**
 
 ---
-## ⚙️ Configuração de ambiente
+##  Configuração de ambiente
 
 Na **raiz do projeto**, crie o arquivo `.env`:
 

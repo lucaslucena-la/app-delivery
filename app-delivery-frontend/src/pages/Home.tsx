@@ -10,6 +10,8 @@ export default function Home() {
   const handleLogout = () => {
     clearUser();
     setUser(null);
+    window.location.reload(); // força a atualização da página
+
   };
 
   return (
@@ -23,7 +25,7 @@ export default function Home() {
           className={styles.floatingNavbar}
         >
           <Container>
-            <Navbar.Brand as={Link} to="/">DeliveryApp</Navbar.Brand>
+            <Navbar.Brand as={Link} to="/">FlashFood</Navbar.Brand>
             <Navbar.Toggle aria-controls="basic-navbar-nav" />
             <Navbar.Collapse id="basic-navbar-nav">
               <Nav className="ms-auto">
@@ -32,13 +34,14 @@ export default function Home() {
                     <Nav.Item className="me-3 d-flex align-items-center">
                       Olá, {user.username}
                     </Nav.Item>
-                    <Button variant="outline-light" size="sm" onClick={handleLogout}>
+                    <Button variant="dark" size="sm" onClick={handleLogout}>
                       Sair
                     </Button>
                   </>
                 ) : (
                   <>
                     <Nav.Link as={Link} to="/login">Login</Nav.Link>
+                    <Nav.Link as={Link} to="/restaurantes">Restaurantes</Nav.Link>
                     <Nav.Link as={Link} to="/cadastro">Cadastro Cliente</Nav.Link>
                   </>
                 )}

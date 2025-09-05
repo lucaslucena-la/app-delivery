@@ -15,10 +15,10 @@ import CadastroRestaurante from "./pages/CadastroRestaurante";
 import Catalogo from "./pages/Catalogo";
 
 //layouts
-import PainelLayout from './pages/painel/PainelLayout';
+import PainelLayout from './pages/servidor/PainelLayout';
 import ClienteLayout from './pages/cliente/ClienteLayout';
 
-import Dashboard from './pages/painel/Dashboard';
+import Dashboard from './pages/servidor/Dashboard';
 import ProtectedRoute from "./components/ProtectedRoute";
 import { getUser} from "./store/auth";
 

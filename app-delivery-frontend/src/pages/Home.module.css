@@ -36,7 +36,7 @@
   text-decoration: none;
 }
 .floatingNavbar :global(.navbar-brand) { font-weight: 600;  color: #ff0000;}
-.floatingNavbar a:hover { text-decoration: none; }
+.floatingNavbar a:hover { text-decoration: none; color: #cb0505; }
 
 /* ====== HERO GRID (painel esquerda | conteúdo direita) ====== */
 .heroGrid{

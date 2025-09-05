@@ -12,7 +12,7 @@ export default function ClienteLayout() {
       <header className={styles.header}>
         <div className={styles.container}>
           <Link to="/restaurantes" className={styles.logo}>
-            FoodDelivery
+            FlashFood
           </Link>
           <nav className={styles.nav}>
             <Link to="/meus-pedidos" className={styles.navLink}>

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import {Link } from "react-router-dom";
 import { loginRequest } from "../services/auth";
 import { saveUser } from "../store/auth";
 
@@ -13,14 +13,11 @@ type LoginProps = {
   onLoginSuccess: () => void;
 };
 
-// 2. O componente agora recebe as props. Usamos a desestruturação { onLoginSuccess }.
 export default function Login({ onLoginSuccess }: LoginProps) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  const navigate = useNavigate();
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -44,36 +41,19 @@ export default function Login({ onLoginSuccess }: LoginProps) {
       setLoading(false);
     }
   };
-
-  const [user, setUser] = useState(getUser());
-    
-    const handleLogout = () => {
-      clearUser();
-      setUser(null);
-    };
-
+  
   return (
 
-    
     <div>
 
       <header style={{ padding: 12, borderBottom: "1px solid #eee", display: "flex", gap: 12, alignItems: "center" }}>
         <Link to="/">Home</Link>
         <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: '16px' }}>
-          
-          {user ? (
-            <>
-              <span style={{ marginRight: 8 }}>Olá, {user.username}</span>
-              <button onClick={handleLogout}>Sair</button>
-            </>
-          ) : (
-            <>
-              <Link to="/login" style={{ marginRight: 8 }}>Login</Link>
-              <Link to="/cadastro">Cadastro Cliente</Link>
-              <span style={{ borderLeft: '1px solid #ccc', height: '20px' }}></span>
-              <Link to="/cadastro-restaurante">Seja um Parceiro</Link>
-            </>
-          )}
+                  
+          <Link to="/cadastro">Cadastro Cliente</Link>
+          <span style={{ borderLeft: '1px solid #ccc', height: '20px' }}></span>
+          <Link to="/cadastro-restaurante">Seja um Parceiro</Link>
+
         </div>
       </header>
 

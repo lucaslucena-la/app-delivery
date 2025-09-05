@@ -1,39 +1,45 @@
-import { useState } from "react";
+import { useState } from "react"; // 1. Não precisamos mais do useEffect!
 import { registerRequest } from "../services/auth";
 import { useNavigate, Link } from "react-router-dom";
+// 2. Importamos nosso array fixo de um arquivo de constantes
+import { TIPOS_DE_CULINARIA } from "../constants/culinaria"; 
 
 export default function CadastroRestaurante() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  
-  // 1. Adicionamos os estados para os novos campos
   const [endereco, setEndereco] = useState("");
   const [telefone, setTelefone] = useState("");
   
+  // O estado para guardar o ID selecionado continua o mesmo
+  const [idTipoCulinaria, setIdTipoCulinaria] = useState(""); 
+
   const [msg, setMsg] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
   
   const navigate = useNavigate();
+
+  // 3. A função de busca de dados foi removida, simplificando o componente.
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setMsg(null); setErr(null);
     
     try {
-      // 3. Enviamos os novos dados no payload da requisição
+      // A lógica de envio continua a mesma, enviando o ID numérico
       await registerRequest({ 
         username, 
         email, 
         password, 
         is_restaurante: true,
-        endereco, // <-- Novo
-        telefone  // <-- Novo
+        endereco,
+        telefone,
+        id_tipo_culinaria: parseInt(idTipoCulinaria, 10)
       });
       
       setMsg("Cadastro realizado! Você será levado ao login.");
       
-      setTimeout(() => navigate("/restaurante/login"), 1500); 
+      setTimeout(() => navigate("/login"), 1500); 
     } catch (e: any) {
       setErr(e?.response?.data?.message || "Erro no cadastro");
     }
@@ -55,7 +61,6 @@ export default function CadastroRestaurante() {
           <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="contato@restaurante.com" required />
         </label>
 
-        {/* 2. Adicionamos os novos campos ao formulário */}
         <label>
           Endereço Completo
           <input value={endereco} onChange={e => setEndereco(e.target.value)} placeholder="Rua das Flores, 123, Centro" required />
@@ -64,6 +69,19 @@ export default function CadastroRestaurante() {
         <label>
           Telefone para Contato
           <input value={telefone} onChange={e => setTelefone(e.target.value)} placeholder="(11) 98765-4321" required />
+        </label>
+
+        {/* 4. O dropdown agora usa o array fixo para gerar as opções, sem depender de estado */}
+        <label>
+          Principal Tipo de Culinária
+          <select value={idTipoCulinaria} onChange={e => setIdTipoCulinaria(e.target.value)} required>
+            <option value="" disabled>Selecione uma opção</option>
+            {TIPOS_DE_CULINARIA.map(tipo => (
+              <option key={tipo.id} value={tipo.id}>
+                {tipo.descricao}
+              </option>
+            ))}
+          </select>
         </label>
 
         <label>
@@ -83,4 +101,3 @@ export default function CadastroRestaurante() {
     </div>
   );
 }
-

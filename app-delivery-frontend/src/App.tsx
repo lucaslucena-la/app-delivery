@@ -1,39 +1,38 @@
-import { useState } from "react"; // 1. Importamos o useState
+import { useState } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 
-
-
-//páginas públicas
+// Páginas públicas
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Restaurantes from "./pages/Restaurantes";
+import Catalogo from "./pages/Catalogo";
 
-//páginas de cadastro
+// Páginas de cadastro
 import CadastroCliente from "./pages/CadastroCliente";
 import CadastroRestaurante from "./pages/CadastroRestaurante";
 
-import Catalogo from "./pages/Catalogo";
-
-//layouts
+// Layouts e componentes de proteção
 import PainelLayout from './pages/servidor/PainelLayout';
 import ClienteLayout from './pages/cliente/ClienteLayout';
-
-import Dashboard from './pages/servidor/Dashboard';
 import ProtectedRoute from "./components/ProtectedRoute";
-import { getUser} from "./store/auth";
+
+// Páginas do Painel do Restaurante
+import Dashboard from './pages/servidor/Dashboard';
+// --- 1. Importe a nova página aqui ---
+import { GerenciarCardapio } from './pages/servidor/GerenciarCardapio'; 
+
+// Lógica de autenticação
+import { getUser } from "./store/auth";
 
 export default function App() {
   const [user, setUser] = useState(getUser());
 
-  //Esta função será chamada pelo componente Login para "avisar" o App que o login foi feito
+  // Esta função será chamada pelo componente Login para "avisar" o App que o login foi feito
   const handleLoginSuccess = () => {
     setUser(getUser()); 
   };
 
-  
-
   return (
-    
     <div>
       <Routes>
         <Route path="/" element={<Home />} />
@@ -58,20 +57,23 @@ export default function App() {
         <Route path="/cadastro" element={!user ? <CadastroCliente /> : <Navigate to="/" />} />
         <Route path="/cadastro-restaurante" element={!user ? <CadastroRestaurante /> : <Navigate to="/" />} />
     
+        {/* --- ROTAS DO CLIENTE --- */}
         <Route element={<ClienteLayout />}>
           <Route path="/restaurantes" element={<Restaurantes />} />
           <Route path="/restaurantes/:id" element={<Catalogo />} />
         </Route>
 
+        {/* --- ROTAS PROTEGIDAS DO PAINEL DO RESTAURANTE --- */}
         <Route element={<ProtectedRoute />}>
           <Route path="/painel" element={<PainelLayout />}>
             <Route path="dashboard" element={<Dashboard />} />
+            <Route path="cardapio" element={<GerenciarCardapio />} />
           </Route>
         </Route>
 
+        {/* Rota "catch-all" para redirecionar qualquer caminho não encontrado */}
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </div>
   );
 }
-

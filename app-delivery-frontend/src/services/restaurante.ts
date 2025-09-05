@@ -29,6 +29,21 @@ export type Prato = {
   id_categoria: number;
 };
 
+
+export type PratoInput = {
+  id_restaurante: number;
+  nome: string;
+  descricao: string;
+  valor: number;   // em centavos
+  estoque: number;
+  id_categoria: number;
+};
+
+export type TipoCulinaria = {
+  id_tipo_culinaria: number;
+  descricao: string; // Ex: 'italiana', 'japonesa'
+};
+
 /** Lista todos os restaurantes cadastrados no sistema */
 export async function listarRestaurantes() {
   const { data } = await api.get<Restaurante[]>("/restaurante");
@@ -47,4 +62,15 @@ export async function catalogoRestaurante(id: number) {
 export async function criarRestaurante(payload: RestauranteInput) {
   const { data } = await api.post<Restaurante>("/restaurante", payload);
   return data; // retorna o Restaurante recém-criado
+}
+  
+export async function criarPrato(payload: PratoInput) {
+  // A rota no backend para criar um prato é /restaurante/prato
+  const { data } = await api.post<Prato>("/restaurante/prato", payload);
+  return data;
+}
+
+export async function getTiposCulinaria(): Promise<TipoCulinaria[]> {
+  const { data } = await api.get<TipoCulinaria[]>("/tipos-culinaria");
+  return data;
 }

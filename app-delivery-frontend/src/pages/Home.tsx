@@ -69,7 +69,7 @@ export default function Home() {
             <p className={styles.partner}>
               Possui um restaurante?{" "}
               <Link to="/cadastro-restaurante" className={styles.partnerLink}>
-                Venha para o DeliveryApp
+                Venha para o FlashFood
               </Link>
             </p>
           </div>

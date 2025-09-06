@@ -99,44 +99,62 @@ router.post('/cadastro', async (req: Request, res: Response): Promise<any> => {
     }
   */
 
-  const { username, email, password, is_restaurante, endereco, telefone } = req.body;
+ const { username, email, password, is_restaurante, endereco, telefone, id_tipo_culinaria } = req.body;
+
+  if (is_restaurante && (!endereco || !telefone || !id_tipo_culinaria)) {
+      return res.status(400).json({ message: 'Para cadastrar um restaurante, os campos endereço, telefone e tipo de culinária são obrigatórios.' });
+  }
+
+  const client = await pool.connect();
 
   try {
-    if (!username || !email || !password || is_restaurante === undefined) {
-      return res.status(400).json({ message: 'Todos os campos obrigatorios (username, email, password, is_restaurante) devem ser preenchidos.' });
-    }
+    await client.query('BEGIN');
 
     const hashedPassword = await bcrypt.hash(password, 10);
-
-    const result = await pool.query(
-      'INSERT INTO Usuario (usuario, email, senha, is_restaurante) VALUES ($1, $2, $3, $4) RETURNING id_usuario, usuario, is_restaurante',
+    
+    const resultUser = await client.query(
+      'INSERT INTO "usuario" (usuario, email, senha, is_restaurante) VALUES ($1, $2, $3, $4) RETURNING id_usuario, usuario, is_restaurante',
       [username, email, hashedPassword, is_restaurante]
     );
+    const newUser = resultUser.rows[0];
 
-    const newUser = result.rows[0];
-
-    // Se o usuário for restaurante → cria também na tabela Restaurante
     if (newUser.is_restaurante) {
-      // 2. Adicionamos os novos campos ao comando SQL INSERT
-      await pool.query(
-        'INSERT INTO Restaurante (id_usuario, nome, email, endereco, telefone) VALUES ($1, $2, $3, $4, $5)',
-        [newUser.id_usuario, newUser.usuario, email, endereco, telefone] // <-- Passando os novos valores
+      const resultRestaurante = await client.query(
+        'INSERT INTO "restaurante" (id_usuario, nome, email, endereco, telefone) VALUES ($1, $2, $3, $4, $5) RETURNING id_restaurante',
+        [newUser.id_usuario, newUser.usuario, email, endereco, telefone]
+      );
+      const novoRestauranteId = resultRestaurante.rows[0].id_restaurante;
+
+      await client.query(
+        'INSERT INTO "tipo_culinaria_restaurante" (id_restaurante, id_tipo_culinaria) VALUES ($1, $2)',
+        [novoRestauranteId, id_tipo_culinaria]
       );
     }
 
-    return res.status(201).json({ message: 'User registered successfully', user: { id: newUser.id_usuario, username: newUser.usuario, is_restaurante: newUser.is_restaurante } });
+    await client.query('COMMIT');
 
-  // CADASTRO
+    return res.status(201).json({ 
+        message: 'Usuário registrado com sucesso!', 
+        user: { 
+            id: newUser.id_usuario, 
+            username: newUser.usuario, 
+            is_restaurante: newUser.is_restaurante 
+        } 
+    });
+
   } catch (e: any) {
-    console.error('Error during user registration:', e);
-
+    await client.query('ROLLBACK');
+    
+    console.error('Error during user registration transaction:', e);
     if (e.code === '23505') {
       return res.status(400).json({ message: 'Usuário ou email já cadastrado.' });
     }
-
-    return res.status(500).json({ message: 'Internal server error during user registration' });
+    return res.status(500).json({ message: 'Erro interno durante o cadastro do usuário.' });
+  
+  } finally {
+    client.release();
   }
-
 });
+
 
 export default router;

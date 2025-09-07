@@ -247,6 +247,162 @@ router.get('/por-categoria-prato', async (req: Request, res: Response): Promise<
   }
 });
 
+router.put('/prato/:id_prato', async (req: Request, res: Response): Promise<any> => {
+  /*
+    #swagger.tags = ['Restaurante']
+    #swagger.summary = 'Atualiza um prato existente no cardápio de um restaurante.'
+    #swagger.parameters['id_prato'] = {
+      in: 'path',
+      description: 'ID do prato a ser atualizado.',
+      required: true,
+      type: 'integer',
+      example: 1
+    }
+    #swagger.parameters['body'] = {
+      in: 'body',
+      description: 'Dados do prato para atualização. Pelo menos um campo deve ser fornecido.',
+      required: true,
+      schema: {
+        nome: 'Pizza Vegana',
+        descricao: 'Pizza com molho de tomate, queijo vegano e vegetais.',
+        valor: 4500,
+        estoque: 75,
+        id_categoria: 5
+      }
+    }
+    #swagger.responses[200] = {
+      description: 'Prato atualizado com sucesso.',
+      schema: {
+        id_prato: 1,
+        id_restaurante: 1,
+        nome: 'Pizza Vegana',
+        descricao: 'Pizza com molho de tomate, queijo vegano e vegetais.',
+        valor: 4500,
+        estoque: 75,
+        id_categoria: 5
+      }
+    }
+    #swagger.responses[400] = {
+      description: 'Dados inválidos ou nenhum campo para atualizar.',
+      schema: { message: 'ID do prato inválido ou nenhum campo fornecido para atualização.' }
+    }
+    #swagger.responses[404] = {
+      description: 'Prato não encontrado.',
+      schema: { message: 'Prato não encontrado.' }
+    }
+    #swagger.responses[500] = {
+      description: 'Erro interno do servidor durante a atualização do prato.',
+      schema: { message: 'Internal server error' }
+    }
+  */
+
+  const { id_prato } = req.params;
+  const { nome, descricao, valor, estoque, id_categoria } = req.body;
+
+  try {
+    const pratoId = parseInt(id_prato, 10);
+    if (isNaN(pratoId)) {
+      return res.status(400).json({ message: 'ID do prato inválido.' });
+    }
+
+    const fieldsToUpdate: string[] = [];
+    const values: (string | number)[] = [];
+    let paramIndex = 1;
+
+    if (nome !== undefined) {
+      fieldsToUpdate.push(`nome = $${paramIndex++}`);
+      values.push(nome);
+    }
+    if (descricao !== undefined) {
+      fieldsToUpdate.push(`descricao = $${paramIndex++}`);
+      values.push(descricao);
+    }
+    if (valor !== undefined) {
+      fieldsToUpdate.push(`valor = $${paramIndex++}`);
+      values.push(valor);
+    }
+    if (estoque !== undefined) {
+      fieldsToUpdate.push(`estoque = $${paramIndex++}`);
+      values.push(estoque);
+    }
+    if (id_categoria !== undefined) {
+      fieldsToUpdate.push(`id_categoria = $${paramIndex++}`);
+      values.push(id_categoria);
+    }
+
+    if (fieldsToUpdate.length === 0) {
+      return res.status(400).json({ message: 'Nenhum campo fornecido para atualização.' });
+    }
+
+    values.push(pratoId);
+
+    const query = `UPDATE Lista_de_Pratos SET ${fieldsToUpdate.join(', ')} WHERE id_prato = $${paramIndex} RETURNING *;`;
+    const result = await pool.query(query, values);
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ message: 'Prato não encontrado.' });
+    }
+
+    return res.status(200).json(result.rows[0]);
+
+  } catch (e) {
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+router.delete('/prato/:id_prato', async (req: Request, res: Response): Promise<any> => {
+  /*
+    #swagger.tags = ['Restaurante']
+    #swagger.summary = 'Deleta um prato existente do cardápio de um restaurante.'
+    #swagger.parameters['id_prato'] = {
+      in: 'path',
+      description: 'ID do prato a ser deletado.',
+      required: true,
+      type: 'integer',
+      example: 1
+    }
+    #swagger.responses[200] = {
+      description: 'Prato deletado com sucesso.',
+      schema: { message: 'Prato deletado com sucesso.' }
+    }
+    #swagger.responses[400] = {
+      description: 'ID do prato inválido.',
+      schema: { message: 'ID do prato inválido.' }
+    }
+    #swagger.responses[404] = {
+      description: 'Prato não encontrado.',
+      schema: { message: 'Prato não encontrado.' }
+    }
+    #swagger.responses[500] = {
+      description: 'Erro interno do servidor durante a exclusão do prato.',
+      schema: { message: 'Internal server error' }
+    }
+  */
+
+  const { id_prato } = req.params;
+
+  try {
+    const pratoId = parseInt(id_prato, 10);
+    if (isNaN(pratoId)) {
+      return res.status(400).json({ message: 'ID do prato inválido.' });
+    }
+
+    const result = await pool.query(
+      'DELETE FROM Lista_de_Pratos WHERE id_prato = $1 RETURNING *;',
+      [pratoId]
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ message: 'Prato não encontrado.' });
+    }
+
+    return res.status(200).json({ message: 'Prato deletado com sucesso.' });
+
+  } catch (e) {
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
 router.post('/prato', async (req: Request, res: Response): Promise<any> => {
 
   /*

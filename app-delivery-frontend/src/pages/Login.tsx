@@ -1,14 +1,9 @@
 import React, { useState } from "react";
-import {Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { loginRequest } from "../services/auth";
 import { saveUser } from "../store/auth";
+import styles from './Login.module.css'; // Importa o nosso novo CSS
 
-
-import { getUser, clearUser } from "../store/auth";
-
-
-// 1. Definimos o tipo das "props" que o componente espera receber.
-//    Neste caso, ele espera uma função chamada 'onLoginSuccess'.
 type LoginProps = {
   onLoginSuccess: () => void;
 };
@@ -20,22 +15,17 @@ export default function Login({ onLoginSuccess }: LoginProps) {
   const [error, setError] = useState<string | null>(null);
 
   const onSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     setError(null);
     setLoading(true);
     
     try {
-      const response = await loginRequest({username, password});
-
+      const response = await loginRequest({ username, password });
       if (response.user) {
-        // Salva os dados do usuário no localStorage
         saveUser(response.user);
-
         onLoginSuccess();
-
       }
     } catch(err: any) {
-      // Corrigi um pequeno erro de digitação aqui (era 'reponse')
       setError(err?.response?.data?.message || "Usuário ou senha inválidos");
     } finally {
       setLoading(false);
@@ -43,43 +33,64 @@ export default function Login({ onLoginSuccess }: LoginProps) {
   };
   
   return (
-
-    <div>
-
-      <header style={{ padding: 12, borderBottom: "1px solid #eee", display: "flex", gap: 12, alignItems: "center" }}>
-        <Link to="/">Home</Link>
-        <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: '16px' }}>
-                  
-          <Link to="/cadastro">Cadastro Cliente</Link>
-          <span style={{ borderLeft: '1px solid #ccc', height: '20px' }}></span>
-          <Link to="/cadastro-restaurante">Seja um Parceiro</Link>
-
+    <div className={styles.pageContainer}>
+      <header className={styles.header}>
+        <Link to="/" className={styles.navLink}>Home</Link>
+        <div className={styles.headerNav}>
+          <Link to="/cadastro" className={styles.navLink}>Cadastro Cliente</Link>
+          <span className={styles.navSeparator}></span>
+          <Link to="/cadastro-restaurante" className={styles.navLink}>Seja um Parceiro</Link>
         </div>
       </header>
 
-      <div style={{ maxWidth: 360, margin: "4rem auto", padding: 24, border: "1px solid #eee", borderRadius: 12 }}>
-        <h2 style={{ textAlign: 'center', marginBottom: '24px' }}>Acessar minha conta</h2>
-        <form onSubmit={onSubmit} style={{ display: "grid", gap: 12 }}>
-          <label>
-            Usuário
-            <input value={username} onChange={e => setUsername(e.target.value)} placeholder="Seu nome de usuário" required />
-          </label>
-          <label>
-            Senha
-            <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" required />
-          </label>
-          <button type="submit" disabled={loading}>{loading ? "Entrando..." : "Entrar"}</button>
-          {error && <p style={{ color: "crimson" }}>{error}</p>}
-          <p style={{ marginTop: 24, textAlign: 'center', color: '#6b7280' }}>
+      <div className={styles.loginCard}>
+        <h2 className={styles.title}>Acessar minha conta</h2>
+        <form onSubmit={onSubmit} className={styles.form}>
+          <div className={styles.formGroup}>
+            <label className={styles.label} htmlFor="username">
+              Usuário
+            </label>
+            <input 
+              id="username"
+              className={styles.input} 
+              value={username} 
+              onChange={e => setUsername(e.target.value)} 
+              placeholder="Seu nome de usuário" 
+              required 
+            />
+          </div>
+          
+          <div className={styles.formGroup}>
+            <label className={styles.label} htmlFor="password">
+              Senha
+            </label>
+            <input 
+              id="password"
+              className={styles.input} 
+              type="password" 
+              value={password} 
+              onChange={e => setPassword(e.target.value)} 
+              placeholder="••••••••" 
+              required 
+            />
+          </div>
+          
+          <button type="submit" disabled={loading} className={styles.button}>
+            {loading ? "Entrando..." : "Entrar"}
+          </button>
+          
+          {error && <p className={styles.errorMessage}>{error}</p>}
+          
+          <p className={styles.signupPrompt}>
             Ainda não tem uma conta?
           </p>
-          <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', marginTop: '8px' }}>
-            <Link to="/cadastro">Criar conta de Cliente</Link>
-            <Link to="/cadastro-restaurante">Cadastrar meu Restaurante</Link>
+          
+          <div className={styles.signupLinksContainer}>
+            <Link to="/cadastro" className={styles.signupLink}>Criar conta de Cliente</Link>
+            <Link to="/cadastro-restaurante" className={styles.signupLink}>Cadastrar meu Restaurante</Link>
           </div>
         </form>
       </div>
     </div>
   );
 }
-

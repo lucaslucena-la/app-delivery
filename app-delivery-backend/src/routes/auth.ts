@@ -55,7 +55,28 @@ router.post('/login', async (req: Request, res: Response): Promise<any> => {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
-    return res.status(200).json({ message: 'Login successful', user: { id: user.id_usuario, username: user.usuario, is_restaurante: user.is_restaurante } });
+    const userPayload = {
+      id: user.id_usuario,
+      username: user.usuario,
+      is_restaurante: user.is_restaurante,
+      id_restaurante: null // NOVO: Inicia a propriedade como nula
+    };
+
+    // NOVO: Se o usuário for um restaurante, busca o ID correspondente
+    if (user.is_restaurante) {
+      const restauranteResult = await pool.query(
+        'SELECT id_restaurante FROM Restaurante WHERE id_usuario = $1',
+        [user.id_usuario]
+      );
+
+      // Verifica se o resultado da consulta é válido antes de acessar rowCount e rows 
+      if (restauranteResult && restauranteResult.rowCount != null && restauranteResult.rowCount > 0) {
+        // Adiciona o id_restaurante ao objeto que será enviado ao frontend
+        userPayload.id_restaurante = restauranteResult.rows[0].id_restaurante;
+      }
+    }
+
+    return res.status(200).json({ message: 'Login successful', user: userPayload });
 
   
   } catch (e: any) {

@@ -131,7 +131,7 @@
   font-weight: 700;
   text-decoration: none;
 }
-.partnerLink:hover{ text-decoration: underline; }
+.partnerLink:hover{ text-decoration: none; color: #920c0c; }
 
 .heroContent {
   position: relative; 

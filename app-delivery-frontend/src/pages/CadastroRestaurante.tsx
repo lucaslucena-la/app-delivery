@@ -3,6 +3,7 @@ import { registerRequest } from "../services/auth";
 import { useNavigate, Link } from "react-router-dom";
 // 2. Importamos nosso array fixo de um arquivo de constantes
 import { TIPOS_DE_CULINARIA } from "../constants/culinaria"; 
+import styles from "./Cadastro.module.css";
 
 export default function CadastroRestaurante() {
   const [username, setUsername] = useState("");
@@ -46,58 +47,62 @@ export default function CadastroRestaurante() {
   }
 
   return (
-    <div style={{ maxWidth: 420, margin: "4rem auto", padding: 24, border: "1px solid #eee", borderRadius: 12 }}>
-      <h2>Cadastre seu Restaurante</h2>
-      <p>Crie sua conta de parceiro com as informações principais do seu estabelecimento.</p>
-      
-      <form onSubmit={onSubmit} style={{ display: "grid", gap: 12, marginTop: 16 }}>
-        <label>
-          Nome do Restaurante (será usado no login)
-          <input value={username} onChange={e => setUsername(e.target.value)} placeholder="restaurante_legal" required />
-        </label>
+    <div className={styles.pageContainer}>
+      {/* NOVO: Header para consistência visual */}
+      <header className={styles.header}>
+        <Link to="/" className={styles.navLink}>Home</Link>
+      </header>
+
+      <div className={styles.card}>
+        <h2 className={styles.title}>Cadastre seu Restaurante</h2>
+        <p className={styles.subtitle}>Crie sua conta de parceiro para começar a vender.</p>
         
-        <label>
-          E-mail de Contato
-          <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="contato@restaurante.com" required />
-        </label>
+        <form onSubmit={onSubmit} className={styles.form}>
+          <div className={styles.formGroup}>
+            <label className={styles.label} htmlFor="username">Nome do Restaurante (será usado no login)</label>
+            <input id="username" className={styles.input} value={username} onChange={e => setUsername(e.target.value)} placeholder="restaurante_legal" required />
+          </div>
+          
+          <div className={styles.formGroup}>
+            <label className={styles.label} htmlFor="email">E-mail de Contato</label>
+            <input id="email" className={styles.input} type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="contato@restaurante.com" required />
+          </div>
 
-        <label>
-          Endereço Completo
-          <input value={endereco} onChange={e => setEndereco(e.target.value)} placeholder="Rua das Flores, 123, Centro" required />
-        </label>
+          <div className={styles.formGroup}>
+            <label className={styles.label} htmlFor="endereco">Endereço Completo</label>
+            <input id="endereco" className={styles.input} value={endereco} onChange={e => setEndereco(e.target.value)} placeholder="Rua das Flores, 123, Centro" required />
+          </div>
 
-        <label>
-          Telefone para Contato
-          <input value={telefone} onChange={e => setTelefone(e.target.value)} placeholder="(11) 98765-4321" required />
-        </label>
+          <div className={styles.formGroup}>
+            <label className={styles.label} htmlFor="telefone">Telefone para Contato</label>
+            <input id="telefone" className={styles.input} value={telefone} onChange={e => setTelefone(e.target.value)} placeholder="(11) 98765-4321" required />
+          </div>
 
-        {/* 4. O dropdown agora usa o array fixo para gerar as opções, sem depender de estado */}
-        <label>
-          Principal Tipo de Culinária
-          <select value={idTipoCulinaria} onChange={e => setIdTipoCulinaria(e.target.value)} required>
-            <option value="" disabled>Selecione uma opção</option>
-            {TIPOS_DE_CULINARIA.map(tipo => (
-              <option key={tipo.id} value={tipo.id}>
-                {tipo.descricao}
-              </option>
-            ))}
-          </select>
-        </label>
+          <div className={styles.formGroup}>
+            <label className={styles.label} htmlFor="culinaria">Principal Tipo de Culinária</label>
+            <select id="culinaria" className={styles.select} value={idTipoCulinaria} onChange={e => setIdTipoCulinaria(e.target.value)} required>
+              <option value="" disabled>Selecione uma opção</option>
+              {TIPOS_DE_CULINARIA.map(tipo => (
+                <option key={tipo.id} value={tipo.id}>{tipo.descricao}</option>
+              ))}
+            </select>
+          </div>
 
-        <label>
-          Senha de Acesso
-          <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" required />
-        </label>
+          <div className={styles.formGroup}>
+            <label className={styles.label} htmlFor="password">Senha de Acesso</label>
+            <input id="password" className={styles.input} type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" required />
+          </div>
 
-        <button type="submit">Criar Conta de Parceiro</button>
+          <button type="submit" className={styles.button}>Criar Conta de Parceiro</button>
 
-        {msg && <p style={{ color: "green" }}>{msg}</p>}
-        {err && <p style={{ color: "crimson" }}>{err}</p>}
-      </form>
+          {msg && <p className={`${styles.feedbackMessage} ${styles.success}`}>{msg}</p>}
+          {err && <p className={`${styles.feedbackMessage} ${styles.error}`}>{err}</p>}
+        </form>
 
-      <p style={{ marginTop: 12 }}>
-        Já é parceiro? <Link to="/login">Faça o login aqui</Link>
-      </p>
+        <p className={styles.loginPrompt}>
+          Já é parceiro? <Link to="/login" className={styles.loginLink}>Faça o login aqui</Link>
+        </p>
+      </div>
     </div>
   );
 }

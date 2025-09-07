@@ -22,7 +22,7 @@ export async function registerRequest(payload: {
   is_restaurante: boolean;
   endereco?: string;
   telefone?: string;
-  id_tipo_culinaria: number; 
+  id_tipo_culinaria?: number; 
 }) {
   const { data } = await api.post("/auth/cadastro", payload);
   return data; // retorna a resposta da API (pode ser mensagem ou user criado)

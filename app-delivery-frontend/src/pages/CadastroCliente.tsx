@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { registerRequest } from "../services/auth";
 import { useNavigate, Link } from "react-router-dom";
+import styles from "./Cadastro.module.css";
 
 export default function CadastroCliente() {
   const [username, setUsername] = useState("");
@@ -29,36 +30,42 @@ export default function CadastroCliente() {
     }
   }
 
-  return (
-    <div style={{ maxWidth: 420, margin: "4rem auto", padding: 24, border: "1px solid #eee", borderRadius: 12 }}>
-      <h2>Crie sua Conta</h2>
-      <p>Cadastre-se para começar a pedir.</p>
+   return (
+    <div className={styles.pageContainer}>
+      <header className={styles.header}>
+        <Link to="/" className={styles.navLink}>Home</Link>
+      </header>
       
-      <form onSubmit={onSubmit} style={{ display: "grid", gap: 12, marginTop: 16 }}>
-        <label>
-          Nome de Usuário
-          <input value={username} onChange={e => setUsername(e.target.value)} placeholder="joao123" required />
-        </label>
+      <div className={styles.card}>
+        <h2 className={styles.title}>Crie sua Conta</h2>
+        <p className={styles.subtitle}>Cadastre-se para começar a pedir.</p>
         
-        <label>
-          E-mail
-          <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="email@exemplo.com" required />
-        </label>
+        <form onSubmit={onSubmit} className={styles.form}>
+          <div className={styles.formGroup}>
+            <label className={styles.label} htmlFor="username">Nome de Usuário</label>
+            <input id="username" className={styles.input} value={username} onChange={e => setUsername(e.target.value)} placeholder="joao123" required />
+          </div>
+          
+          <div className={styles.formGroup}>
+            <label className={styles.label} htmlFor="email">E-mail</label>
+            <input id="email" className={styles.input} type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="email@exemplo.com" required />
+          </div>
 
-        <label>
-          Senha
-          <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" required />
-        </label>
+          <div className={styles.formGroup}>
+            <label className={styles.label} htmlFor="password">Senha</label>
+            <input id="password" className={styles.input} type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" required />
+          </div>
 
-        <button type="submit">Cadastrar</button>
+          <button type="submit" className={styles.button}>Cadastrar</button>
 
-        {msg && <p style={{ color: "green" }}>{msg}</p>}
-        {err && <p style={{ color: "crimson" }}>{err}</p>}
-      </form>
+          {msg && <p className={`${styles.feedbackMessage} ${styles.success}`}>{msg}</p>}
+          {err && <p className={`${styles.feedbackMessage} ${styles.error}`}>{err}</p>}
+        </form>
 
-      <p style={{ marginTop: 12 }}>
-        Já tem conta? <Link to="/login">Fazer login</Link>
-      </p>
+        <p className={styles.loginPrompt}>
+          Já tem conta? <Link to="/login" className={styles.loginLink}>Fazer login</Link>
+        </p>
+      </div>
     </div>
   );
 }

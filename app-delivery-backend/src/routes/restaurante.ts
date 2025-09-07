@@ -4,8 +4,6 @@ import pool from '../db/pool';
 const router = Router();
 
 router.get('/', async (req: Request, res: Response): Promise<any> => {
-
-
   /*
     #swagger.tags = ['Restaurante']
     #swagger.summary = 'Retorna todos os restaurantes cadastrados.'
@@ -29,7 +27,7 @@ router.get('/', async (req: Request, res: Response): Promise<any> => {
       schema: { message: 'Internal server error' }
     }
   */
- 
+
   try {
     const result = await pool.query('SELECT * FROM Restaurante;');
 
@@ -81,7 +79,7 @@ router.get('/catalogo', async (req: Request, res: Response): Promise<any> => {
       schema: { message: 'Internal server error' }
     }
   */
-  
+
   const id = req.query.id;
 
   try {
@@ -92,6 +90,154 @@ router.get('/catalogo', async (req: Request, res: Response): Promise<any> => {
 
     if (result.rowCount === 0) {
       return res.status(404).json({ message: 'Restaurante nao tem nenhum prato cadastrado.' });
+    }
+
+    return res.status(200).json(result.rows);
+
+  } catch (e) {
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+router.get('/por-tipo-culinaria', async (req: Request, res: Response): Promise<any> => {
+  /*
+    #swagger.tags = ['Restaurante']
+    #swagger.summary = 'Retorna restaurantes de um tipo de culinária específico.'
+    #swagger.parameters['tipo'] = {
+      in: 'query',
+      description: 'Tipo de culinária para filtrar os restaurantes (e.g., italiana, japonesa).',
+      required: true,
+      type: 'string',
+      enum: ['generalista','italiana', 'churrascaria', 'cafeteria', 'lanchonete', 'japonesa', 'sobremesas'],
+      example: 'italiana'
+    }
+    #swagger.responses[200] = {
+      description: 'Lista de restaurantes encontrados para o tipo de culinária.',
+      schema: [{
+        id_restaurante: 1,
+        nome: 'Pizza Palace',
+        email: 'contato@pizzapalace.com',
+        endereco: 'Rua das Pizzas, 123',
+        telefone: '11444555666',
+        id_usuario: 3
+      }]
+    }
+    #swagger.responses[400] = {
+      description: 'Tipo de culinária não fornecido.',
+      schema: { message: 'O tipo de culinária eh necessario para filtrar os restaurantes.' }
+    }
+    #swagger.responses[404] = {
+      description: 'Nenhum restaurante encontrado para o tipo de culinária especificado.',
+      schema: { message: 'Nenhum restaurante encontrado para o tipo de culinaria especificado.' }
+    }
+    #swagger.responses[500] = {
+      description: 'Erro interno do servidor.',
+      schema: { message: 'Internal server error' }
+    }
+  */
+
+  const tipo = req.query.tipo;
+
+  try {
+    if (!tipo) {
+      return res.status(400).json({ message: 'O tipo de culinária eh necessario para filtrar os restaurantes.' });
+    }
+
+    const result = await pool.query(
+      `SELECT
+          R.id_restaurante,
+          R.nome,
+          R.email,
+          R.endereco,
+          R.telefone,
+          R.id_usuario
+        FROM
+          Restaurante AS R
+        JOIN
+          Tipo_Culinaria_Restaurante AS TCR ON R.id_restaurante = TCR.id_restaurante
+        JOIN
+          Tipo_Culinaria AS TC ON TCR.id_tipo_culinaria = TC.id_tipo_culinaria
+        WHERE
+          TC.descricao = $1;`,
+      [tipo]
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ message: 'Nenhum restaurante encontrado para o tipo de culinaria especificado.' });
+    }
+
+    return res.status(200).json(result.rows);
+
+  } catch (e) {
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+router.get('/por-categoria-prato', async (req: Request, res: Response): Promise<any> => {
+  /*
+    #swagger.tags = ['Restaurante']
+    #swagger.summary = 'Retorna restaurantes que oferecem pratos de uma categoria específica.'
+    #swagger.parameters['categoria'] = {
+      in: 'query',
+      description: 'Categoria do prato para filtrar os restaurantes (e.g., combos, salgados, doces).',
+      required: true,
+      type: 'string',
+      enum: ['combos', 'baratos', 'salgados', 'doces', 'frios', 'quentes'],
+      example: 'salgados'
+    }
+    #swagger.responses[200] = {
+      description: 'Lista de restaurantes encontrados que oferecem pratos da categoria.',
+      schema: [{
+        id_restaurante: 1,
+        nome: 'Pizza Palace',
+        email: 'contato@pizzapalace.com',
+        endereco: 'Rua das Pizzas, 123',
+        telefone: '11444555666',
+        id_usuario: 3
+      }]
+    }
+    #swagger.responses[400] = {
+      description: 'Categoria de prato não fornecida.',
+      schema: { message: 'A categoria do prato eh necessaria para filtrar os restaurantes.' }
+    }
+    #swagger.responses[404] = {
+      description: 'Nenhum restaurante encontrado para a categoria de prato especificada.',
+      schema: { message: 'Nenhum restaurante encontrado para a categoria de prato especificada.' }
+    }
+    #swagger.responses[500] = {
+      description: 'Erro interno do servidor.',
+      schema: { message: 'Internal server error' }
+    }
+  */
+
+  const categoria = req.query.categoria;
+
+  try {
+    if (!categoria) {
+      return res.status(400).json({ message: 'A categoria do prato eh necessaria para filtrar os restaurantes.' });
+    }
+
+    const result = await pool.query(
+      `SELECT DISTINCT
+          R.id_restaurante,
+          R.nome,
+          R.email,
+          R.endereco,
+          R.telefone,
+          R.id_usuario
+        FROM
+          Restaurante AS R
+        JOIN
+          Lista_de_Pratos AS LP ON R.id_restaurante = LP.id_restaurante
+        JOIN
+          Categoria_Pratos AS CP ON LP.id_categoria = CP.id_categoria
+        WHERE
+          CP.descricao = $1;`,
+      [categoria]
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ message: 'Nenhum restaurante encontrado para a categoria de prato especificada.' });
     }
 
     return res.status(200).json(result.rows);
@@ -140,7 +286,7 @@ router.post('/prato', async (req: Request, res: Response): Promise<any> => {
       schema: { message: 'Internal server error' }
     }
   */
-  
+
   const { id_restaurante, nome, descricao, valor, estoque, id_categoria } = req.body;
 
   try {
@@ -159,5 +305,6 @@ router.post('/prato', async (req: Request, res: Response): Promise<any> => {
     return res.status(500).json({ message: 'Internal server error' });
   }
 });
+
 
 export default router;

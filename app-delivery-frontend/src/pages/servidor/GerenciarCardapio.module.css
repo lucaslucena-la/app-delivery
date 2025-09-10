@@ -164,8 +164,12 @@
 
 /* Estilos para os botões de ação na tabela */
 .actionsCell {
-  display: flex;
-  gap: 0.5rem;
+  text-align: right; 
+  white-space: nowrap; 
+}
+
+.actionsCell button + button {
+  margin-left: 8px;
 }
 
 .actionButton {
@@ -177,11 +181,12 @@
 }
 
 .editButton {
-  background-color: #ffc107; /* Amarelo */
-  color: #212529;
+  background-color: #007bff; /* Amarelo */
+  color: #ffffff;
 }
 
 .deleteButton {
   background-color: #dc3545; /* Vermelho */
   color: white;
 }
+

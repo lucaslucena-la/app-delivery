@@ -223,7 +223,6 @@ export function GerenciarCardapio() {
                 <th>Categoria</th>
                 <th>Valor</th>
                 <th>Estoque</th>
-                {/* --- NOVO: Coluna de ações --- */}
                 <th>Ações</th>
               </tr>
             </thead>
@@ -235,8 +234,7 @@ export function GerenciarCardapio() {
                   <td>{getCategoriaNome(prato.id_categoria)}</td>
                   <td>{formatarValor(prato.valor)}</td>
                   <td>{prato.estoque} un.</td>
-                  {/* --- NOVO: Célula com os botões --- */}
-                  <td className={styles.actionsCell}>
+                 <td className={styles.actionsCell}>
                     <button 
                       onClick={() => handleOpenModalEdicao(prato)}
                       className={`${styles.actionButton} ${styles.editButton}`}

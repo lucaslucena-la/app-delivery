@@ -9,7 +9,6 @@ export default defineConfig({
     // tornando-o acessível de fora do contêiner Docker.
     host: true,
     port: 5173, // Garante que a porta é a 5173
-    // Essa configuração é crucial para o Hot Reload (atualização automática) funcionar corretamente com Docker.
     watch: {
       usePolling: true
     }

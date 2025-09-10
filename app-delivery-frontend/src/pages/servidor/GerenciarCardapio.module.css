@@ -124,3 +124,64 @@
   background-color: #f8d7da;
   border: 1px solid #f5c6cb;
 }
+
+
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modalContent {
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+.modalActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.buttonSecondary {
+  background-color: #6c757d;
+}
+.buttonSecondary:hover {
+  background-color: #5a6268;
+}
+
+/* Estilos para os botões de ação na tabela */
+.actionsCell {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.actionButton {
+  padding: 0.3rem 0.6rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.8rem;
+}
+
+.editButton {
+  background-color: #ffc107; /* Amarelo */
+  color: #212529;
+}
+
+.deleteButton {
+  background-color: #dc3545; /* Vermelho */
+  color: white;
+}

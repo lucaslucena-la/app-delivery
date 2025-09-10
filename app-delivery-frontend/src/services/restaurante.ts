@@ -70,6 +70,15 @@ export async function criarPrato(payload: PratoInput) {
   return data;
 }
 
+export async function atualizarPrato(id_prato: number, dados: Partial<PratoInput>): Promise<Prato> {
+  const response = await api.put(`/restaurante/prato/${id_prato}`, dados);
+  return response.data;
+}
+
+export async function excluirPrato(id_prato: number): Promise<void> {
+  await api.delete(`/restaurante/prato/${id_prato}`);
+}
+
 export async function getTiposCulinaria(): Promise<TipoCulinaria[]> {
   const { data } = await api.get<TipoCulinaria[]>("/tipos-culinaria");
   return data;

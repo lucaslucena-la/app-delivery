@@ -58,7 +58,7 @@ router.post('/', async (req: Request, res: Response): Promise<any> => {
       schema: { message: 'Internal server error during order creation' }
     }
   */
-  
+
   const { id_cliente, id_restaurante, forma_pagamento, items } = req.body;
 
   const client = await pool.connect();
@@ -124,6 +124,78 @@ router.post('/', async (req: Request, res: Response): Promise<any> => {
 
   } catch (e) {
     await client.query('ROLLBACK');
+    return res.status(500).json({ message: 'Internal server error' });
+  } finally {
+    client.release();
+  }
+});
+
+router.get('/:id', async (req: Request, res: Response): Promise<any> => {
+  /*
+    #swagger.tags = ['Pedidos']
+    #swagger.summary = 'Retorna um pedido pelo seu ID.'
+    #swagger.parameters['id'] = {
+      in: 'path',
+      description: 'ID do pedido a ser retornado.',
+      required: true,
+      type: 'integer'
+    }
+    #swagger.responses[200] = {
+      description: 'Pedido encontrado com sucesso.',
+      schema: {
+        id_pedido: 5,
+        id_cliente: 1,
+        id_restaurante: 1,
+        data_pedido: '2024-01-01T10:00:00.000Z',
+        status: 'pedido_esperando_ser_aceito',
+        forma_pagamento: 'pix',
+        valor: 8500,
+        taxa: 2550,
+        items: [
+          {
+            id_item_pedido: 1,
+            id_prato: 1,
+            quantidade_item: 1,
+            infos_adicionais: 'Sem cebola',
+            preco_por_item: 5000
+          },
+          {
+            id_item_pedido: 2,
+            id_prato: 2,
+            quantidade_item: 2,
+            infos_adicionais: '',
+            preco_por_item: 1750
+          }
+        ]
+      }
+    }
+    #swagger.responses[404] = {
+      description: 'Pedido não encontrado.',
+      schema: { message: 'Pedido com ID X nao encontrado.' }
+    }
+    #swagger.responses[500] = {
+      description: 'Erro interno do servidor ao buscar o pedido.',
+      schema: { message: 'Internal server error during order retrieval' }
+    }
+  */
+  const { id } = req.params;
+  const client = await pool.connect();
+
+  try {
+    const orderResult = await client.query('SELECT * FROM Pedido WHERE id_pedido = $1', [id]);
+
+    if (orderResult.rowCount === 0) {
+      return res.status(404).json({ message: `Pedido com ID ${id} nao encontrado.` });
+    }
+
+    const order = orderResult.rows[0];
+
+    const itemsResult = await client.query('SELECT * FROM Item_Pedido WHERE id_pedido = $1', [id]);
+    order.items = itemsResult.rows;
+
+    return res.status(200).json(order);
+
+  } catch (e) {
     return res.status(500).json({ message: 'Internal server error' });
   } finally {
     client.release();

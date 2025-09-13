@@ -20,6 +20,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import Dashboard from './pages/servidor/Dashboard';
 import { GerenciarCardapio } from './pages/servidor/GerenciarCardapio'; 
 import { Configuracoes } from "./pages/servidor/Configuracoes";
+import { GerenciarPedidos } from "./pages/servidor/GerenciarPedidos.tsx";
 
 import Carrinho from "./pages/cliente/Carrinho.tsx";
 import { CarrinhoProvider } from './context/CarrinhoContext.tsx'
@@ -76,6 +77,7 @@ export default function App() {
               <Route path="dashboard" element={<Dashboard />} />
               <Route path="cardapio" element={<GerenciarCardapio />} />
               <Route path="configuracoes" element={<Configuracoes />} />
+              <Route path="pedidos" element={<GerenciarPedidos />} />
             </Route>
           </Route>
 

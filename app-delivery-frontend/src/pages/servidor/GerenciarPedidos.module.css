@@ -1,0 +1,120 @@
+.container {
+  padding: 2rem;
+  font-family: sans-serif;
+}
+
+.title {
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+  color: #333;
+}
+
+.pedidosList {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.pedidoCard {
+  background-color: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: box-shadow 0.2s;
+}
+
+.pedidoCard:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.pedidoHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  border-bottom: 1px solid #f0f0f0;
+  padding-bottom: 1rem;
+  margin-bottom: 1rem;
+}
+
+.pedidoHeader p {
+  margin: 0.3rem 0;
+  color: #555;
+  font-size: 0.9rem;
+}
+
+.pedidoValorStatus {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.5rem;
+  font-weight: bold;
+}
+
+.statusBadge {
+  display: inline-block;
+  padding: 0.3rem 0.8rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  text-transform: capitalize;
+  color: #fff;
+}
+
+/* Cores para os status */
+.pedido_esperando_ser_aceito { background-color: #ffc107; color: #333; }
+.em_preparo { background-color: #007bff; }
+.saiu_para_entrega { background-color: #17a2b8; }
+.completo { background-color: #28a745; }
+.cancelado { background-color: #dc3545; }
+
+.pedidoActions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 1rem;
+}
+
+.statusSelect {
+  padding: 0.5rem;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  background-color: #f8f9fa;
+  cursor: pointer;
+}
+
+.detailsButton {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  background-color: #6c757d;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.detailsButton:hover {
+  background-color: #5a6268;
+}
+
+.pedidoDetalhes {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #f0f0f0;
+}
+
+.pedidoDetalhes ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.pedidoDetalhes li {
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #f9f9f9;
+}
+
+.observacao {
+  font-style: italic;
+  color: #777;
+  font-size: 0.85rem;
+  margin-top: 0.25rem;
+}

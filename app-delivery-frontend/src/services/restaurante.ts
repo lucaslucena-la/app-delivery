@@ -44,6 +44,26 @@ export type TipoCulinaria = {
   descricao: string; // Ex: 'italiana', 'japonesa'
 };
 
+export interface PedidoResponse {
+  id_pedido: number;
+  nome_cliente: string; // <-- ATUALIZADO
+  id_cliente: number; // A API retorna o ID do cliente
+  id_restaurante: number;
+  data_pedido: string;
+  status: string;
+  forma_pagamento: string;
+  valor: number;
+  taxa: number;
+  items: {
+    id_item_pedido: number;
+    nome_prato: string;
+    id_prato: number;
+    quantidade_item: number;
+    infos_adicionais: string;
+    preco_por_item: number;
+  }[];
+}
+
 /** Lista todos os restaurantes cadastrados no sistema */
 export async function listarRestaurantes() {
   const { data } = await api.get<Restaurante[]>("/restaurante");
@@ -81,5 +101,10 @@ export async function excluirPrato(id_prato: number): Promise<void> {
 
 export async function getTiposCulinaria(): Promise<TipoCulinaria[]> {
   const { data } = await api.get<TipoCulinaria[]>("/tipos-culinaria");
+  return data;
+}
+
+export async function getPedidosRestaurante(id_restaurante: number): Promise<PedidoResponse[]> {
+  const { data } = await api.get(`/restaurante/${id_restaurante}/pedidos`);
   return data;
 }

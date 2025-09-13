@@ -518,7 +518,12 @@ router.get('/:id/pedidos', async (req: Request, res: Response): Promise<any> => 
     }
 
     const result = await pool.query(
-      'SELECT * FROM Pedido WHERE id_restaurante = $1;',
+      `SELECT 
+         p.*, 
+         c.nome AS nome_cliente 
+       FROM Pedido p
+       JOIN Cliente c ON p.id_cliente = c.id_cliente
+       WHERE p.id_restaurante = $1;`,
       [restauranteId]
     );
 
@@ -527,7 +532,15 @@ router.get('/:id/pedidos', async (req: Request, res: Response): Promise<any> => 
     }
 
     const ordersWithItems = await Promise.all(result.rows.map(async (order) => {
-      const itemsResult = await pool.query('SELECT id_item_pedido, id_prato, quantidade_item, infos_adicionais, preco_por_item FROM Item_Pedido WHERE id_pedido = $1', [order.id_pedido]);
+      const itemsResult = await pool.query(
+        `SELECT 
+           ip.*, 
+           lp.nome AS nome_prato 
+         FROM Item_Pedido ip
+         JOIN Lista_de_Pratos lp ON ip.id_prato = lp.id_prato
+         WHERE ip.id_pedido = $1`, 
+        [order.id_pedido]
+      );
       return { ...order, items: itemsResult.rows };
     }));
 

@@ -1,51 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { getUser } from '../../store/auth.ts';
-// import { getPedidosRestaurante, updateStatusPedido } from '../../services/pedido'; // Funções que criaremos
+import { getPedidosRestaurante, type PedidoResponse } from '../../services/restaurante.ts';
+// import { updateStatusPedido } from '../../services/pedido';
 import styles from './GerenciarPedidos.module.css';
-
-// --- Tipos de Dados (Exemplo) ---
-// Estes tipos devem espelhar a resposta da sua nova API
-interface ItemPedido {
-  nome_prato: string;
-  quantidade_item: number;
-  infos_adicionais: string;
-}
-
-interface Pedido {
-  id_pedido: number;
-  nome_cliente: string;
-  data_pedido: string;
-  status: string;
-  valor: number;
-  itens: ItemPedido[];
-}
-
-// --- Dados de Exemplo (Enquanto a API não existe) ---
-const mockPedidos: Pedido[] = [
-  {
-    id_pedido: 8,
-    nome_cliente: 'Ana Beatriz',
-    data_pedido: '2025-09-12T21:48:15.792Z',
-    status: 'pedido_esperando_ser_aceito',
-    valor: 5500,
-    itens: [
-      { nome_prato: 'Pizza Pepperoni', quantidade_item: 1, infos_adicionais: 'Borda recheada com cheddar' },
-      { nome_prato: 'Refrigerante 2L', quantidade_item: 1, infos_adicionais: '' },
-    ],
-  },
-  {
-    id_pedido: 7,
-    nome_cliente: 'Carlos Silva',
-    data_pedido: '2025-09-12T20:30:00.000Z',
-    status: 'em_preparo',
-    valor: 4000,
-    itens: [{ nome_prato: 'Pizza Margherita', quantidade_item: 1, infos_adicionais: 'Sem orégano' }],
-  },
-];
 
 // Componente principal
 export function GerenciarPedidos() {
-  const [pedidos, setPedidos] = useState<Pedido[]>([]);
+  const [pedidos, setPedidos] = useState<PedidoResponse[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [pedidoExpandido, setPedidoExpandido] = useState<number | null>(null);
@@ -58,32 +19,26 @@ export function GerenciarPedidos() {
         setIsLoading(false);
         return;
       }
-
       try {
-        // --- LÓGICA FICTÍCIA ---
-        // Quando a rota existir,  faremos a chamada aqui:
-        // const data = await getPedidosRestaurante(user.id_restaurante);
-        // setPedidos(data);
-        setTimeout(() => {
-          setPedidos(mockPedidos);
-          setIsLoading(false);
-        }, 1000); // Simula carregamento
+        const data = await getPedidosRestaurante(user.id_restaurante);
+        // A ordenação agora pode vir direto do banco, mas manter aqui não prejudica
+        const pedidosOrdenados = data.sort((a, b) => b.id_pedido - a.id_pedido);
+        setPedidos(pedidosOrdenados);
       } catch (err: any) {
-        setError(err.message || "Falha ao buscar pedidos.");
+        setError(err?.response?.data?.message || "Falha ao buscar pedidos.");
+      } finally {
         setIsLoading(false);
       }
     };
-
     carregarPedidos();
   }, []);
 
   const handleUpdateStatus = async (id_pedido: number, novoStatus: string) => {
-    console.log(`Simulando atualização do pedido ${id_pedido} para o status: ${novoStatus}`);
-    // Lógica da API: await updateStatusPedido(id_pedido, novoStatus);
-    
-    // Atualiza o estado local para refletir a mudança instantaneamente
+    console.log(`(Simulação) Atualizando pedido ${id_pedido} para status: ${novoStatus}`);
+    // Futuramente, a chamada real da API virá aqui:
+    // await updateStatusPedido(id_pedido, novoStatus);
     setPedidos(pedidosAtuais =>
-      pedidosAtuais.map(p => (p.id_pedido === id_pedido ? { ...p, status: novoStatus } : p))
+        pedidosAtuais.map(p => (p.id_pedido === id_pedido ? { ...p, status: novoStatus } : p))
     );
   };
 
@@ -137,8 +92,8 @@ export function GerenciarPedidos() {
                 <div className={styles.pedidoDetalhes}>
                   <h4>Itens do Pedido:</h4>
                   <ul>
-                    {pedido.itens.map((item, index) => (
-                      <li key={index}>
+                    {pedido.items.map((item) => (
+                      <li key={item.id_item_pedido}>
                         <p><strong>{item.quantidade_item}x {item.nome_prato}</strong></p>
                         {item.infos_adicionais && <p className={styles.observacao}>Obs: {item.infos_adicionais}</p>}
                       </li>

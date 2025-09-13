@@ -135,10 +135,26 @@ router.post('/cadastro', async (req: Request, res: Response): Promise<any> => {
     }
   */
 
- const { username, email, password, is_restaurante, endereco, telefone, id_tipo_culinaria } = req.body;
+ const { 
+    username, 
+    email, 
+    password, 
+    is_restaurante, 
+    endereco, 
+    telefone, 
+    id_tipo_culinaria,
+    // --- CAMPOS DO CLIENTE ---
+    nome_completo, 
+    cpf
+  } = req.body;
 
   if (is_restaurante && (!endereco || !telefone || !id_tipo_culinaria)) {
       return res.status(400).json({ message: 'Para cadastrar um restaurante, os campos endereço, telefone e tipo de culinária são obrigatórios.' });
+  }
+
+  // --- NOVA VALIDAÇÃO PARA CLIENTE ---
+  if (!is_restaurante && (!nome_completo || !cpf)) {
+    return res.status(400).json({ message: 'Para cadastrar um cliente, nome completo e CPF são obrigatórios.' });
   }
 
   const client = await pool.connect();
@@ -155,6 +171,7 @@ router.post('/cadastro', async (req: Request, res: Response): Promise<any> => {
     const newUser = resultUser.rows[0];
 
     if (newUser.is_restaurante) {
+      // Sua lógica existente para restaurantes (está correta)
       const resultRestaurante = await client.query(
         'INSERT INTO "restaurante" (id_usuario, nome, email, endereco, telefone) VALUES ($1, $2, $3, $4, $5) RETURNING id_restaurante',
         [newUser.id_usuario, newUser.usuario, email, endereco, telefone]
@@ -164,6 +181,12 @@ router.post('/cadastro', async (req: Request, res: Response): Promise<any> => {
       await client.query(
         'INSERT INTO "tipo_culinaria_restaurante" (id_restaurante, id_tipo_culinaria) VALUES ($1, $2)',
         [novoRestauranteId, id_tipo_culinaria]
+      );
+    } else {
+      // Se não for restaurante, insere na tabela "cliente", vinculando com o id_usuario
+      await client.query(
+        'INSERT INTO "cliente" (id_usuario, nome, email, cpf, telefone) VALUES ($1, $2, $3, $4, $5)',
+        [newUser.id_usuario, nome_completo, email, cpf, telefone]
       );
     }
 
@@ -182,8 +205,8 @@ router.post('/cadastro', async (req: Request, res: Response): Promise<any> => {
     await client.query('ROLLBACK');
     
     console.error('Error during user registration transaction:', e);
-    if (e.code === '23505') {
-      return res.status(400).json({ message: 'Usuário ou email já cadastrado.' });
+    if (e.code === '23505') { // Código de erro para violação de constraint UNIQUE
+      return res.status(409).json({ message: 'Usuário ou email já cadastrado.' });
     }
     return res.status(500).json({ message: 'Erro interno durante o cadastro do usuário.' });
   

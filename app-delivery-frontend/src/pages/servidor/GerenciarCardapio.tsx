@@ -257,7 +257,7 @@ export function GerenciarCardapio() {
         )}
       </section>
 
-      {/* --- NOVO: Renderiza o modal condicionalmente --- */}
+      {/* --- Renderiza o modal condicionalmente --- */}
       {isModalOpen && (
         <ModalEditarPrato
           prato={pratoEmEdicao}

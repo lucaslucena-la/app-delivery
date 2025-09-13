@@ -11,6 +11,8 @@ export default function ClienteLayout() {
     <div className={styles.layout}>
       <header className={styles.header}>
         <div className={styles.container}>
+
+          
           <Link to="/restaurantes" className={styles.logo}>
             FlashFood
           </Link>

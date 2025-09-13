@@ -6,6 +6,7 @@ export type User = {
   username: string;
   is_restaurante: boolean;
   id_restaurante?: number;
+  id_cliente?: number;
 };
 
 // Função de login -> envia username e password e retorna {message, user}

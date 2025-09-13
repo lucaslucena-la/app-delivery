@@ -59,7 +59,9 @@ router.post('/login', async (req: Request, res: Response): Promise<any> => {
       id: user.id_usuario,
       username: user.usuario,
       is_restaurante: user.is_restaurante,
-      id_restaurante: null // NOVO: Inicia a propriedade como nula
+      id_restaurante: null ,
+      id_cliente: null 
+
     };
 
     // NOVO: Se o usuário for um restaurante, busca o ID correspondente
@@ -73,6 +75,19 @@ router.post('/login', async (req: Request, res: Response): Promise<any> => {
       if (restauranteResult && restauranteResult.rowCount != null && restauranteResult.rowCount > 0) {
         // Adiciona o id_restaurante ao objeto que será enviado ao frontend
         userPayload.id_restaurante = restauranteResult.rows[0].id_restaurante;
+      }
+    }else{
+      // --- NOVO: Lógica para encontrar o ID do cliente ---
+      // Se o usuário não é um restaurante, ele é um cliente.
+      const clienteResult = await pool.query(
+        'SELECT id_cliente FROM Cliente WHERE id_usuario = $1',
+        [user.id_usuario]
+      );
+
+      // Verifica se o resultado da consulta é válido antes de acessar rowCount e rows
+      if (clienteResult && clienteResult.rowCount != null && clienteResult.rowCount > 0) {
+        // Adiciona o id_cliente ao objeto que será enviado ao frontend
+        userPayload.id_cliente = clienteResult.rows[0].id_cliente;
       }
     }
 

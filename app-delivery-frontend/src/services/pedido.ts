@@ -14,7 +14,7 @@ export async function criarPedido(payload: {
   forma_pagamento: "pix" | "em_especie" | "credito" | "debito";
   items: ItemPedidoPayload[]; // lista de pratos escolhidos
 }) {
-  const { data } = await api.post("/pedido", payload);
+  const { data } = await api.post("/pedidos", payload);
   return data; // esperado: { message, pedido }
 }
 

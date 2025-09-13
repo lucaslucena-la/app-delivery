@@ -60,12 +60,9 @@
   color: #fff;
 }
 
-/* Cores para os status */
 .pedido_esperando_ser_aceito { background-color: #ffc107; color: #333; }
-.em_preparo { background-color: #007bff; }
-.saiu_para_entrega { background-color: #17a2b8; }
-.completo { background-color: #28a745; }
-.cancelado { background-color: #dc3545; }
+.em_preparacao { background-color: #007bff; color: white; }
+.a_caminho { background-color: #00b90c; color: white; }
 
 .pedidoActions {
   display: flex;
@@ -118,3 +115,4 @@
   font-size: 0.85rem;
   margin-top: 0.25rem;
 }
+

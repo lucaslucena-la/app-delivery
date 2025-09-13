@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { getUser } from '../../store/auth.ts';
-import { getPedidosRestaurante, type PedidoResponse } from '../../services/restaurante.ts';
-// import { updateStatusPedido } from '../../services/pedido';
+import { getUser } from '../../store/auth';
+import { getPedidosRestaurante,  type PedidoResponse } from '../../services/restaurante';
+import { updateStatusPedido } from '../../services/pedido';
 import styles from './GerenciarPedidos.module.css';
 
 // Componente principal
@@ -10,6 +10,7 @@ export function GerenciarPedidos() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [pedidoExpandido, setPedidoExpandido] = useState<number | null>(null);
+  const [updatingStatus, setUpdatingStatus] = useState<number | null>(null); // Para desabilitar o select durante a atualização
 
   useEffect(() => {
     const carregarPedidos = async () => {
@@ -21,8 +22,7 @@ export function GerenciarPedidos() {
       }
       try {
         const data = await getPedidosRestaurante(user.id_restaurante);
-        // A ordenação agora pode vir direto do banco, mas manter aqui não prejudica
-        const pedidosOrdenados = data.sort((a, b) => b.id_pedido - a.id_pedido);
+        const pedidosOrdenados = data.sort((a, b) => new Date(b.data_pedido).getTime() - new Date(a.data_pedido).getTime()); // Mostra os mais recentes primeiro
         setPedidos(pedidosOrdenados);
       } catch (err: any) {
         setError(err?.response?.data?.message || "Falha ao buscar pedidos.");
@@ -34,12 +34,33 @@ export function GerenciarPedidos() {
   }, []);
 
   const handleUpdateStatus = async (id_pedido: number, novoStatus: string) => {
-    console.log(`(Simulação) Atualizando pedido ${id_pedido} para status: ${novoStatus}`);
-    // Futuramente, a chamada real da API virá aqui:
-    // await updateStatusPedido(id_pedido, novoStatus);
+    const user = getUser();
+    if (!user?.id_restaurante) return;
+    
+    setUpdatingStatus(id_pedido); // Desabilita o select
+    
+    // Guarda o status antigo para reverter em caso de erro
+    const statusAntigo = pedidos.find(p => p.id_pedido === id_pedido)?.status;
+
+    // Atualiza o estado local para uma resposta visual imediata
     setPedidos(pedidosAtuais =>
         pedidosAtuais.map(p => (p.id_pedido === id_pedido ? { ...p, status: novoStatus } : p))
     );
+
+    try {
+      await updateStatusPedido(user.id_restaurante, id_pedido, novoStatus);
+      // Sucesso! A mudança já está refletida na UI.
+    } catch (err) {
+      alert("Falha ao atualizar o status. A alteração será desfeita.");
+      // Reverte a mudança na UI em caso de erro na API
+      if (statusAntigo) {
+        setPedidos(pedidosAtuais =>
+          pedidosAtuais.map(p => (p.id_pedido === id_pedido ? { ...p, status: statusAntigo } : p))
+        );
+      }
+    } finally {
+      setUpdatingStatus(null); // Reabilita o select
+    }
   };
 
   const toggleDetalhes = (id_pedido: number) => {
@@ -62,7 +83,7 @@ export function GerenciarPedidos() {
               <div className={styles.pedidoHeader}>
                 <div>
                   <strong>Pedido #{pedido.id_pedido}</strong>
-                  <p>Cliente: {pedido.nome_cliente}</p>
+                  <p>Cliente: {pedido.nome_cliente || `ID ${pedido.id_cliente}`}</p>
                   <p>Data: {new Date(pedido.data_pedido).toLocaleString('pt-BR')}</p>
                 </div>
                 <div className={styles.pedidoValorStatus}>
@@ -78,10 +99,12 @@ export function GerenciarPedidos() {
                   className={styles.statusSelect}
                   value={pedido.status}
                   onChange={(e) => handleUpdateStatus(pedido.id_pedido, e.target.value)}
+                  disabled={updatingStatus === pedido.id_pedido} // Desabilita durante a atualização
                 >
                   <option value="pedido_esperando_ser_aceito">Pendente</option>
-                  <option value="em_preparo">Em Preparo</option>
-                  <option value="saiu_para_entrega">Saiu para Entrega</option>
+                  <option value="em_preparacao">Em Preparação</option>
+                  <option value="a_caminho">A Caminho</option>
+                  
                 </select>
                 <button onClick={() => toggleDetalhes(pedido.id_pedido)} className={styles.detailsButton}>
                   {pedidoExpandido === pedido.id_pedido ? 'Ocultar Detalhes' : 'Ver Detalhes'}
@@ -94,7 +117,7 @@ export function GerenciarPedidos() {
                   <ul>
                     {pedido.items.map((item) => (
                       <li key={item.id_item_pedido}>
-                        <p><strong>{item.quantidade_item}x {item.nome_prato}</strong></p>
+                        <p><strong>{item.quantidade_item}x {item.nome_prato || `ID Prato ${item.id_prato}`}</strong></p>
                         {item.infos_adicionais && <p className={styles.observacao}>Obs: {item.infos_adicionais}</p>}
                       </li>
                     ))}

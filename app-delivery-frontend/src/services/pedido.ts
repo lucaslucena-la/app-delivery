@@ -26,3 +26,9 @@ export async function pagarPedido(payload: {
   const { data } = await api.post("/pagamento", payload);
   return data; // esperado: confirmação de pagamento
 }
+
+export async function updateStatusPedido(id_restaurante: number, id_pedido: number, status: string) {
+  // A URL corresponde à nova rota criada no backend: PUT /restaurante/:id/pedido/:id/status
+  const { data } = await api.put(`/restaurante/${id_restaurante}/pedido/${id_pedido}/status`, { status });
+  return data;
+}

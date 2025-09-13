@@ -463,7 +463,6 @@ router.post('/prato', async (req: Request, res: Response): Promise<any> => {
   }
 });
 
-
 router.get('/:id/pedidos', async (req: Request, res: Response): Promise<any> => {
   /*
     #swagger.tags = ['Restaurante']
@@ -552,6 +551,70 @@ router.get('/:id/pedidos', async (req: Request, res: Response): Promise<any> => 
   }
 });
 
+router.get('/:id', async (req: Request, res: Response): Promise<any> => {
+  /*
+    #swagger.tags = ['Restaurante']
+    #swagger.summary = 'Retorna os detalhes de um restaurante específico pelo ID.'
+    #swagger.parameters['id'] = {
+      in: 'path',
+      description: 'ID do restaurante a ser retornado.',
+      required: true,
+      type: 'integer',
+      example: 1
+    }
+    #swagger.responses[200] = {
+      description: 'Detalhes do restaurante encontrados com sucesso.',
+      schema: {
+        id_restaurante: 1,
+        nome: 'Pizza Palace',
+        endereco: 'Rua das Pizzas, 123',
+        telefone: '11444555666',
+        email: 'contato@pizzapalace.com',
+        id_usuario: 3
+      }
+    }
+    #swagger.responses[404] = {
+      description: 'Restaurante não encontrado.'
+    }
+    #swagger.responses[500] = {
+      description: 'Erro interno do servidor.'
+    }
+  */
+  const { id } = req.params;
+
+  try {
+    const restauranteId = parseInt(id, 10);
+    if (isNaN(restauranteId)) {
+      return res.status(400).json({ message: 'ID do restaurante inválido.' });
+    }
+
+    const result = await pool.query(
+      `SELECT
+         r.id_restaurante,
+         r.nome,
+         r.endereco,
+         r.telefone,
+         u.email,
+         r.id_usuario
+       FROM Restaurante r
+       JOIN Usuario u ON r.id_usuario = u.id_usuario
+       WHERE r.id_restaurante = $1;`,
+      [restauranteId]
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ message: 'Restaurante não encontrado.' });
+    }
+
+    // Retorna o objeto do restaurante com os detalhes combinados
+    return res.status(200).json(result.rows[0]);
+
+  } catch (e) {
+    console.error('Erro ao buscar detalhes do restaurante:', e);
+    return res.status(500).json({ message: 'Erro interno do servidor.' });
+  }
+});
+
 router.put('/:id_restaurante', async (req: Request, res: Response): Promise<any> => {
   /*
     #swagger.tags = ['Restaurante']
@@ -603,77 +666,52 @@ router.put('/:id_restaurante', async (req: Request, res: Response): Promise<any>
   const { nome, endereco, telefone, email, senha } = req.body;
 
   if (!nome || !endereco || !telefone) {
-    return res.status(400).json({ message: 'Nome, endereço e telefone são obrigatórios e não podem ser vazios.' });
+    return res.status(400).json({ message: 'Nome, endereço e telefone são obrigatórios.' });
   }
 
-  if (email !== undefined && typeof email === 'string' && !email.trim()) {
-    return res.status(400).json({ message: 'O email não pode ser vazio se fornecido.' });
-  }
-  if (senha !== undefined && typeof senha === 'string' && !senha.trim()) {
-    return res.status(400).json({ message: 'A senha não pode ser vazia se fornecida.' });
-  }
+  const client = await pool.connect();
 
   try {
-    const restaurantAndUserResult = await pool.query(
-      `SELECT r.id_usuario, u.email AS current_user_email
-       FROM Restaurante r
-       JOIN Usuario u ON r.id_usuario = u.id_usuario
-       WHERE r.id_restaurante = $1;`,
+    await client.query('BEGIN');
+
+    const userResult = await client.query(
+      `SELECT id_usuario FROM Restaurante WHERE id_restaurante = $1;`,
       [id_restaurante]
     );
 
-    if (restaurantAndUserResult.rows.length === 0) {
+    if (userResult.rows.length === 0) {
+      await client.query('ROLLBACK');
       return res.status(404).json({ message: 'Restaurante não encontrado.' });
     }
+    const { id_usuario } = userResult.rows[0];
 
-    const { id_usuario, current_user_email } = restaurantAndUserResult.rows[0];
+    // 2. ATUALIZA A TABELA Restaurante (INCLUINDO O EMAIL)
+    const restauranteUpdateFields = ['nome = $1', 'endereco = $2', 'telefone = $3'];
+    const restauranteUpdateValues = [nome, endereco, telefone];
+    let paramIndex = 4;
 
-    if (email && email !== current_user_email) {
-      const existingUserWithEmail = await pool.query(
-        `SELECT id_usuario FROM Usuario WHERE email = $1;`,
-        [email]
-      );
-      if (existingUserWithEmail.rows.length > 0 && existingUserWithEmail.rows[0].id_usuario !== id_usuario) {
-        return res.status(409).json({ message: 'Email já cadastrado para outro usuário.' });
-      }
+    if (email) {
+      restauranteUpdateFields.push(`email = $${paramIndex++}`);
+      restauranteUpdateValues.push(email);
     }
 
-    const restauranteUpdateFields = [];
-    const restauranteUpdateValues = [];
-    let paramIndex = 1;
-
-    if (nome) {
-      restauranteUpdateFields.push(`nome = $${paramIndex++}`);
-      restauranteUpdateValues.push(nome);
-    }
-    if (endereco) {
-      restauranteUpdateFields.push(`endereco = $${paramIndex++}`);
-      restauranteUpdateValues.push(endereco);
-    }
-    if (telefone) {
-      restauranteUpdateFields.push(`telefone = $${paramIndex++}`);
-      restauranteUpdateValues.push(telefone);
-    }
-
-    let updatedRestaurantData;
-    if (restauranteUpdateFields.length > 0) {
-      const restauranteQuery = `
-        UPDATE Restaurante
-        SET ${restauranteUpdateFields.join(', ')}
-        WHERE id_restaurante = $${paramIndex}
-        RETURNING *;
-      `;
-      const result = await pool.query(restauranteQuery, [...restauranteUpdateValues, id_restaurante]);
-      updatedRestaurantData = result.rows[0];
-    } else {
-      const result = await pool.query(`SELECT * FROM Restaurante WHERE id_restaurante = $1;`, [id_restaurante]);
-      updatedRestaurantData = result.rows[0];
-    }
+    const restauranteQuery = `
+      UPDATE Restaurante
+      SET ${restauranteUpdateFields.join(', ')}
+      WHERE id_restaurante = $${paramIndex}
+      RETURNING *;
+    `;
+    const updatedRestaurantResult = await client.query(restauranteQuery, [...restauranteUpdateValues, id_restaurante]);
+    const updatedRestaurantData = updatedRestaurantResult.rows[0];
 
     const usuarioUpdateFields = [];
     const usuarioUpdateValues = [];
     let usuarioParamIndex = 1;
 
+    if (nome) {
+      usuarioUpdateFields.push(`usuario = $${usuarioParamIndex++}`);
+      usuarioUpdateValues.push(nome);
+    }
     if (email) {
       usuarioUpdateFields.push(`email = $${usuarioParamIndex++}`);
       usuarioUpdateValues.push(email);
@@ -692,23 +730,28 @@ router.put('/:id_restaurante', async (req: Request, res: Response): Promise<any>
         WHERE id_usuario = $${usuarioParamIndex}
         RETURNING *;
       `;
-      const result = await pool.query(usuarioQuery, [...usuarioUpdateValues, id_usuario]);
+      const result = await client.query(usuarioQuery, [...usuarioUpdateValues, id_usuario]);
       updatedUserData = result.rows[0];
     } else {
-      const result = await pool.query(`SELECT * FROM Usuario WHERE id_usuario = $1;`, [id_usuario]);
+      const result = await client.query(`SELECT * FROM Usuario WHERE id_usuario = $1;`, [id_usuario]);
       updatedUserData = result.rows[0];
     }
+    
+    await client.query('COMMIT');
 
     const finalResponse = {
       ...updatedRestaurantData,
-      email: updatedUserData.email,
-      id_usuario: updatedUserData.id_usuario,
+      email: updatedUserData.email, // Garante que o email retornado é o mais recente
     };
-
+    
     res.status(200).json(finalResponse);
 
   } catch (error) {
+    await client.query('ROLLBACK');
+    console.error('Erro na transação de atualização:', error);
     res.status(500).json({ message: 'Erro interno do servidor.' });
+  } finally {
+    client.release();
   }
 });
 

@@ -10,6 +10,7 @@ export type Restaurante = {
   id_usuario: number; // FK para usuário dono do restaurante
 };
 
+
 // Estrutura mínima usada na criação de um restaurante (sem id_usuario/id_restaurante)
 export type RestauranteInput = {
   nome: string;
@@ -64,6 +65,25 @@ export interface PedidoResponse {
   }[];
 }
 
+export interface UpdateRestaurantePayload {
+  nome: string;
+  endereco: string;
+  telefone: string;
+  email?: string;
+  senha?: string;
+}
+
+// --- NOVA FUNÇÃO ADICIONADA ---
+/**
+ * Busca os detalhes completos de um restaurante específico.
+ * @param id_restaurante O ID do restaurante a ser buscado.
+ * @returns Os detalhes do restaurante.
+ */
+export async function getRestauranteDetalhes(id_restaurante: number): Promise<Restaurante> {
+  const { data } = await api.get(`/restaurante/${id_restaurante}`);
+  return data;
+}
+
 /** Lista todos os restaurantes cadastrados no sistema */
 export async function listarRestaurantes() {
   const { data } = await api.get<Restaurante[]>("/restaurante");
@@ -108,3 +128,9 @@ export async function getPedidosRestaurante(id_restaurante: number): Promise<Ped
   const { data } = await api.get(`/restaurante/${id_restaurante}/pedidos`);
   return data;
 }
+
+export async function updateRestaurante(id_restaurante: number, payload: UpdateRestaurantePayload) {
+  const { data } = await api.put(`/restaurante/${id_restaurante}`, payload);
+  return data;
+}
+

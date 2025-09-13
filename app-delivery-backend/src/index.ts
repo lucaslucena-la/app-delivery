@@ -5,6 +5,7 @@ import restaurante from './routes/restaurante'
 import pagamento from './routes/pagamento'
 import pedidos from './routes/pedidos'
 import swagger from './swagger/router'
+import usuario from './routes/usuario'
 
 const app = express();
 const PORT = 3001;
@@ -20,6 +21,7 @@ app.use('/auth', auth);
 app.use('/restaurante', restaurante);
 app.use('/pagamento', pagamento);
 app.use('/pedidos', pedidos);
+app.use('/usuario', usuario);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

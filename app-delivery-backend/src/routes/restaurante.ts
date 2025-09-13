@@ -1,5 +1,6 @@
 import { Router, Request, Response } from 'express';
 import pool from '../db/pool';
+import bcrypt from 'bcrypt';
 
 const router = Router();
 
@@ -518,9 +519,9 @@ router.get('/:id/pedidos', async (req: Request, res: Response): Promise<any> => 
     }
 
     const result = await pool.query(
-      `SELECT 
-         p.*, 
-         c.nome AS nome_cliente 
+      `SELECT
+         p.*,
+         c.nome AS nome_cliente
        FROM Pedido p
        JOIN Cliente c ON p.id_cliente = c.id_cliente
        WHERE p.id_restaurante = $1;`,
@@ -533,12 +534,12 @@ router.get('/:id/pedidos', async (req: Request, res: Response): Promise<any> => 
 
     const ordersWithItems = await Promise.all(result.rows.map(async (order) => {
       const itemsResult = await pool.query(
-        `SELECT 
-           ip.*, 
-           lp.nome AS nome_prato 
+        `SELECT
+           ip.*,
+           lp.nome AS nome_prato
          FROM Item_Pedido ip
          JOIN Lista_de_Pratos lp ON ip.id_prato = lp.id_prato
-         WHERE ip.id_pedido = $1`, 
+         WHERE ip.id_pedido = $1`,
         [order.id_pedido]
       );
       return { ...order, items: itemsResult.rows };
@@ -548,6 +549,259 @@ router.get('/:id/pedidos', async (req: Request, res: Response): Promise<any> => 
 
   } catch (e) {
     return res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+router.put('/:id_restaurante', async (req: Request, res: Response): Promise<any> => {
+  /*
+    #swagger.tags = ['Restaurante']
+    #swagger.summary = 'Atualiza as informações de um restaurante.'
+    #swagger.parameters['id_restaurante'] = {
+      in: 'path',
+      description: 'ID do restaurante a ser atualizado.',
+      required: true,
+      type: 'integer',
+      example: 1
+    }
+    #swagger.parameters['body'] = {
+      in: 'body',
+      description: 'Novas informações do restaurante. Campos como nome, endereço, telefone, email e senha podem ser atualizados. Nome, endereço e telefone são obrigatórios. Email e senha são opcionais, mas se fornecidos, não podem ser vazios.',
+      required: true,
+      schema: {
+        nome: 'Nome do Restaurante Atualizado',
+        endereco: 'Novo Endereço, 456',
+        telefone: '987654321',
+        email: 'novo_email@restaurante.com',
+        senha: 'nova_senha_segura'
+      }
+    }
+    #swagger.responses[200] = {
+      description: 'Restaurante atualizado com sucesso.',
+      schema: {
+        id_restaurante: 1,
+        nome: 'Nome do Restaurante Atualizado',
+        email: 'novo_email@restaurante.com',
+        endereco: 'Novo Endereço, 456',
+        telefone: '987654321',
+        id_usuario: 1
+      }
+    }
+    #swagger.responses[400] = {
+      description: 'Dados inválidos. Nome, endereço e telefone são obrigatórios. Email e senha, se fornecidos, não podem ser vazios.'
+    }
+    #swagger.responses[404] = {
+      description: 'Restaurante não encontrado.'
+    }
+    #swagger.responses[409] = {
+      description: 'Email já cadastrado.'
+    }
+    #swagger.responses[500] = {
+      description: 'Erro interno do servidor.'
+    }
+  */
+  const { id_restaurante } = req.params;
+  const { nome, endereco, telefone, email, senha } = req.body;
+
+  if (!nome || !endereco || !telefone) {
+    return res.status(400).json({ message: 'Nome, endereço e telefone são obrigatórios e não podem ser vazios.' });
+  }
+
+  if (email !== undefined && typeof email === 'string' && !email.trim()) {
+    return res.status(400).json({ message: 'O email não pode ser vazio se fornecido.' });
+  }
+  if (senha !== undefined && typeof senha === 'string' && !senha.trim()) {
+    return res.status(400).json({ message: 'A senha não pode ser vazia se fornecida.' });
+  }
+
+  try {
+    const restaurantAndUserResult = await pool.query(
+      `SELECT r.id_usuario, u.email AS current_user_email
+       FROM Restaurante r
+       JOIN Usuario u ON r.id_usuario = u.id_usuario
+       WHERE r.id_restaurante = $1;`,
+      [id_restaurante]
+    );
+
+    if (restaurantAndUserResult.rows.length === 0) {
+      return res.status(404).json({ message: 'Restaurante não encontrado.' });
+    }
+
+    const { id_usuario, current_user_email } = restaurantAndUserResult.rows[0];
+
+    if (email && email !== current_user_email) {
+      const existingUserWithEmail = await pool.query(
+        `SELECT id_usuario FROM Usuario WHERE email = $1;`,
+        [email]
+      );
+      if (existingUserWithEmail.rows.length > 0 && existingUserWithEmail.rows[0].id_usuario !== id_usuario) {
+        return res.status(409).json({ message: 'Email já cadastrado para outro usuário.' });
+      }
+    }
+
+    const restauranteUpdateFields = [];
+    const restauranteUpdateValues = [];
+    let paramIndex = 1;
+
+    if (nome) {
+      restauranteUpdateFields.push(`nome = $${paramIndex++}`);
+      restauranteUpdateValues.push(nome);
+    }
+    if (endereco) {
+      restauranteUpdateFields.push(`endereco = $${paramIndex++}`);
+      restauranteUpdateValues.push(endereco);
+    }
+    if (telefone) {
+      restauranteUpdateFields.push(`telefone = $${paramIndex++}`);
+      restauranteUpdateValues.push(telefone);
+    }
+
+    let updatedRestaurantData;
+    if (restauranteUpdateFields.length > 0) {
+      const restauranteQuery = `
+        UPDATE Restaurante
+        SET ${restauranteUpdateFields.join(', ')}
+        WHERE id_restaurante = $${paramIndex}
+        RETURNING *;
+      `;
+      const result = await pool.query(restauranteQuery, [...restauranteUpdateValues, id_restaurante]);
+      updatedRestaurantData = result.rows[0];
+    } else {
+      const result = await pool.query(`SELECT * FROM Restaurante WHERE id_restaurante = $1;`, [id_restaurante]);
+      updatedRestaurantData = result.rows[0];
+    }
+
+    const usuarioUpdateFields = [];
+    const usuarioUpdateValues = [];
+    let usuarioParamIndex = 1;
+
+    if (email) {
+      usuarioUpdateFields.push(`email = $${usuarioParamIndex++}`);
+      usuarioUpdateValues.push(email);
+    }
+    if (senha) {
+      const hashedPassword = await bcrypt.hash(senha, 10);
+      usuarioUpdateFields.push(`senha = $${usuarioParamIndex++}`);
+      usuarioUpdateValues.push(hashedPassword);
+    }
+
+    let updatedUserData;
+    if (usuarioUpdateFields.length > 0) {
+      const usuarioQuery = `
+        UPDATE Usuario
+        SET ${usuarioUpdateFields.join(', ')}
+        WHERE id_usuario = $${usuarioParamIndex}
+        RETURNING *;
+      `;
+      const result = await pool.query(usuarioQuery, [...usuarioUpdateValues, id_usuario]);
+      updatedUserData = result.rows[0];
+    } else {
+      const result = await pool.query(`SELECT * FROM Usuario WHERE id_usuario = $1;`, [id_usuario]);
+      updatedUserData = result.rows[0];
+    }
+
+    const finalResponse = {
+      ...updatedRestaurantData,
+      email: updatedUserData.email,
+      id_usuario: updatedUserData.id_usuario,
+    };
+
+    res.status(200).json(finalResponse);
+
+  } catch (error) {
+    res.status(500).json({ message: 'Erro interno do servidor.' });
+  }
+});
+
+router.put('/:id_restaurante/pedido/:id_pedido/status', async (req: Request, res: Response): Promise<any> => {
+  /*
+    #swagger.tags = ['Restaurante']
+    #swagger.summary = 'Atualiza o status de um pedido específico de um restaurante.'
+    #swagger.parameters['id_restaurante'] = {
+      in: 'path',
+      description: 'ID do restaurante.',
+      required: true,
+      type: 'integer',
+      example: 1
+    }
+    #swagger.parameters['id_pedido'] = {
+      in: 'path',
+      description: 'ID do pedido a ser atualizado.',
+      required: true,
+      type: 'integer',
+      example: 101
+    }
+    #swagger.parameters['body'] = {
+      in: 'body',
+      description: 'Novo status do pedido.',
+      required: true,
+      schema: {
+        status: 'em_preparacao'
+      }
+    }
+    #swagger.responses[200] = {
+      description: 'Status do pedido atualizado com sucesso.',
+      schema: {
+        id_pedido: 101,
+        id_cliente: 1,
+        id_restaurante: 1,
+        data_pedido: '2023-10-27T10:00:00.000Z',
+        status: 'em_preparacao',
+        forma_pagamento: 'credito',
+        valor: 5000,
+        taxa: 500
+      }
+    }
+    #swagger.responses[400] = {
+      description: 'Requisição inválida (e.g., status inválido, IDs não numéricos).'
+    }
+    #swagger.responses[404] = {
+      description: 'Pedido ou restaurante não encontrado, ou pedido não pertence ao restaurante.'
+    }
+    #swagger.responses[500] = {
+      description: 'Erro interno do servidor.'
+    }
+  */
+  const { id_restaurante, id_pedido } = req.params;
+  const { status } = req.body;
+
+  const validStatuses = ['completo', 'em_preparacao', 'a_caminho', 'pedido_esperando_ser_aceito'];
+
+  if (!status || !validStatuses.includes(status)) {
+    return res.status(400).json({ message: 'Status inválido. Status permitidos: ' + validStatuses.join(', ') + '.' });
+  }
+
+  const restauranteId = parseInt(id_restaurante, 10);
+  const pedidoId = parseInt(id_pedido, 10);
+
+  if (isNaN(restauranteId) || isNaN(pedidoId)) {
+    return res.status(400).json({ message: 'IDs de restaurante ou pedido inválidos.' });
+  }
+
+  try {
+    const verificationResult = await pool.query(
+      `SELECT id_pedido FROM Pedido WHERE id_pedido = $1 AND id_restaurante = $2;`,
+      [pedidoId, restauranteId]
+    );
+
+    if (verificationResult.rows.length === 0) {
+      return res.status(404).json({ message: 'Pedido não encontrado para o restaurante especificado.' });
+    }
+
+    const updateQuery = `
+      UPDATE Pedido
+      SET status = $1
+      WHERE id_pedido = $2
+      RETURNING *;
+    `;
+    const result = await pool.query(updateQuery, [status, pedidoId]);
+
+    if (result.rows.length > 0) {
+      res.status(200).json(result.rows[0]);
+    } else {
+      res.status(404).json({ message: 'Pedido não encontrado para atualização.' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: 'Erro interno do servidor.' });
   }
 });
 

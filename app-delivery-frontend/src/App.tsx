@@ -14,16 +14,17 @@ import CadastroRestaurante from "./pages/CadastroRestaurante";
 // Layouts e componentes de proteção
 import PainelLayout from './pages/servidor/PainelLayout';
 import ClienteLayout from './pages/cliente/ClienteLayout';
+import { MeusPedidos } from "./pages/cliente/MeusPedidos";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 // Páginas do Painel do Restaurante
 import Dashboard from './pages/servidor/Dashboard';
 import { GerenciarCardapio } from './pages/servidor/GerenciarCardapio'; 
 import { Configuracoes } from "./pages/servidor/Configuracoes";
-import { GerenciarPedidos } from "./pages/servidor/GerenciarPedidos.tsx";
+import { GerenciarPedidos } from "./pages/servidor/GerenciarPedidos";
 
-import Carrinho from "./pages/cliente/Carrinho.tsx";
-import { CarrinhoProvider } from './context/CarrinhoContext.tsx'
+import Carrinho from "./pages/cliente/Carrinho";
+import { CarrinhoProvider } from './context/CarrinhoContext';
 
 
 // Lógica de autenticação
@@ -39,52 +40,52 @@ export default function App() {
 
   return (
     <CarrinhoProvider>
-      <div>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          
-          {/* --- ROTAS DE AUTENTICAÇÃO --- */}
-          <Route 
-            path="/login" 
-            element={
-              !user ? (
-                // Se não há usuário, mostra a página de login
-                <Login onLoginSuccess={handleLoginSuccess} />
-              ) : user.is_restaurante ? (
-                // Se há um usuário E ele é restaurante, redireciona para o painel
-                <Navigate to="/painel/dashboard" />
-              ) : (
-                // Se há um usuário E ele é cliente, redireciona para a home
-                <Navigate to="/restaurantes" />
-              )
-            } 
-          />
-          
-          <Route path="/cadastro" element={!user ? <CadastroCliente /> : <Navigate to="/" />} />
-          <Route path="/cadastro-restaurante" element={!user ? <CadastroRestaurante /> : <Navigate to="/" />} />
-      
-          {/* --- ROTAS DO CLIENTE --- */}
-          <Route element={<ClienteLayout />}>
-            <Route path="/restaurantes" element={<Restaurantes />} />
-            <Route path="/restaurantes/:id" element={<Catalogo />} />
-            <Route path="/carrinho" element={<Carrinho />} />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        
+        {/* --- ROTAS DE AUTENTICAÇÃO --- */}
+        <Route 
+          path="/login" 
+          element={
+            !user ? (
+              // Se não há usuário, mostra a página de login
+              <Login onLoginSuccess={handleLoginSuccess} />
+            ) : user.is_restaurante ? (
+              // Se há um usuário E ele é restaurante, redireciona para o painel
+              <Navigate to="/painel/dashboard" />
+            ) : (
+              // Se há um usuário E ele é cliente, redireciona para a home
+              <Navigate to="/restaurantes" />
+            )
+          } 
+        />
+        
+        <Route path="/cadastro" element={!user ? <CadastroCliente /> : <Navigate to="/" />} />
+        <Route path="/cadastro-restaurante" element={!user ? <CadastroRestaurante /> : <Navigate to="/" />} />
+    
+        {/* --- ROTAS DO CLIENTE --- */}
+        <Route element={<ClienteLayout />}>
+          <Route path="/restaurantes" element={<Restaurantes />} />
+          <Route path="/restaurantes/:id" element={<Catalogo />} />
+          <Route path="/carrinho" element={<Carrinho />} />
+          <Route path="/meus-pedidos" element={<MeusPedidos />} />
 
+        </Route>
+
+        {/* --- ROTAS PROTEGIDAS DO PAINEL DO RESTAURANTE --- */}
+        <Route element={<ProtectedRoute />}>
+          <Route path="/painel" element={<PainelLayout />}>
+            <Route path="dashboard" element={<Dashboard />} />
+            <Route path="pedidos" element={<GerenciarPedidos />} />
+            <Route path="cardapio" element={<GerenciarCardapio />} />
+            <Route path="configuracoes" element={<Configuracoes />} />
           </Route>
+        </Route>
 
-          {/* --- ROTAS PROTEGIDAS DO PAINEL DO RESTAURANTE --- */}
-          <Route element={<ProtectedRoute />}>
-            <Route path="/painel" element={<PainelLayout />}>
-              <Route path="dashboard" element={<Dashboard />} />
-              <Route path="cardapio" element={<GerenciarCardapio />} />
-              <Route path="configuracoes" element={<Configuracoes />} />
-              <Route path="pedidos" element={<GerenciarPedidos />} />
-            </Route>
-          </Route>
-
-          {/* Rota "catch-all" para redirecionar qualquer caminho não encontrado */}
-          <Route path="*" element={<Navigate to="/" />} />
-        </Routes>
-      </div>
+        {/* Rota "catch-all" para redirecionar qualquer caminho não encontrado */}
+        <Route path="*" element={<Navigate to="/" />} />
+      </Routes>
     </CarrinhoProvider>
   );
 }
+

@@ -202,4 +202,92 @@ router.get('/:id', async (req: Request, res: Response): Promise<any> => {
   }
 });
 
+
+router.get('/cliente/:id_cliente', async (req: Request, res: Response): Promise<any> => {
+  /*
+    #swagger.tags = ['Pedidos']
+    #swagger.summary = 'Retorna o histórico de pedidos de um cliente específico.'
+    #swagger.description = 'Busca todos os pedidos de um cliente, incluindo nome do restaurante e detalhes dos itens.'
+    #swagger.parameters['id_cliente'] = { in: 'path', required: true, type: 'integer' }
+    #swagger.responses[200] = {
+      description: 'Lista de pedidos do cliente.',
+      schema: [{
+        id_pedido: 8,
+        id_cliente: 3,
+        id_restaurante: 1,
+        data_pedido: '2025-09-12T21:48:15.792Z',
+        status: 'completo',
+        forma_pagamento: 'credito',
+        valor: 5500,
+        taxa: 1650,
+        nome_restaurante: 'Pizza Palace',
+        items: [{
+          id_item_pedido: 10,
+          id_prato: 1,
+          id_pedido: 8,
+          quantidade_item: 1,
+          infos_adicionais: 'Borda recheada com cheddar',
+          preco_por_item: 4500,
+          nome_prato: 'Pizza Pepperoni'
+        }]
+      }]
+    }
+    #swagger.responses[400] = {
+      description: 'ID do cliente inválido.',
+      schema: { message: 'ID do cliente inválido.' }
+    }
+    #swagger.responses[404] = {
+      description: 'Nenhum pedido encontrado para este cliente.',
+      schema: { message: 'Nenhum pedido encontrado para este cliente.' }
+    }
+    #swagger.responses[500] = {
+      description: 'Erro interno do servidor.',
+      schema: { message: 'Internal server error' }
+    }
+  */
+  const { id_cliente } = req.params;
+
+  try {
+    const clienteId = parseInt(id_cliente, 10);
+    if (isNaN(clienteId)) {
+      return res.status(400).json({ message: 'ID do cliente inválido.' });
+    }
+
+    const result = await pool.query(
+      `SELECT 
+         p.*, 
+         r.nome AS nome_restaurante 
+       FROM Pedido p
+       JOIN Restaurante r ON p.id_restaurante = r.id_restaurante
+       WHERE p.id_cliente = $1
+       ORDER BY p.data_pedido DESC;`,
+      [clienteId]
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(200).json([]);
+    }
+
+    const ordersWithItems = await Promise.all(result.rows.map(async (order) => {
+      const itemsResult = await pool.query(
+        `SELECT 
+           ip.*, 
+           lp.nome AS nome_prato 
+         FROM Item_Pedido ip
+         JOIN Lista_de_Pratos lp ON ip.id_prato = lp.id_prato
+         WHERE ip.id_pedido = $1`, 
+        [order.id_pedido]
+      );
+      return { ...order, items: itemsResult.rows };
+    }));
+
+    return res.status(200).json(ordersWithItems);
+
+  } catch (e) {
+    console.error("Erro ao buscar pedidos do cliente:", e);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+
 export default router;

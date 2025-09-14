@@ -7,6 +7,20 @@ type ItemPedidoPayload = {
   infos_adicionais?: string; // ex: "sem cebola", "bem passado"
 };
 
+// Define a estrutura da resposta da rota de histórico
+export interface PedidoClienteResponse {
+  id_pedido: number;
+  nome_restaurante: string;
+  data_pedido: string;
+  status: string;
+  valor: number;
+  items: {
+    nome_prato: string;
+    quantidade_item: number;
+    infos_adicionais: string;
+  }[];
+}
+
 // Criação de um novo pedido (cliente → restaurante)
 export async function criarPedido(payload: {
   id_cliente: number;
@@ -32,3 +46,9 @@ export async function updateStatusPedido(id_restaurante: number, id_pedido: numb
   const { data } = await api.put(`/restaurante/${id_restaurante}/pedido/${id_pedido}/status`, { status });
   return data;
 }
+
+export async function getPedidosCliente(id_cliente: number): Promise<PedidoClienteResponse[]> {
+  const { data } = await api.get(`/pedidos/cliente/${id_cliente}`);
+  return data;
+}
+

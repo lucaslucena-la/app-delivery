@@ -161,9 +161,31 @@
   margin-left: var(--sbw-expanded);
 }
 
+/* Botão de logout na parte inferior */
+.logoutButton {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: none;
+  color: #d1d5db;
+  cursor: pointer;
+  border: none;
+  font-size: 15px;
+  transition: background-color .15s ease, color .15s ease;
+}
+
+.logoutButton:hover {
+  background-color: var(--bg-hover);
+  color: #fff;
+}
+
 /* ===== Responsivo opcional ===== */
 @media (max-width: 768px) {
   /* Em telas pequenas, comece expandido para facilitar o toque */
   .sidebar { width: var(--sbw-expanded); }
   .mainContent { margin-left: var(--sbw-expanded); }
 }
+

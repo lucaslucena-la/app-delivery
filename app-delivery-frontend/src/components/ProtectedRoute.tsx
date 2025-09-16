@@ -15,3 +15,8 @@ export default function ProtectedRoute() {
   // Se não atender à condição, volta para a página de login
   return <Navigate to="/login" />;
 }
+
+
+
+
+

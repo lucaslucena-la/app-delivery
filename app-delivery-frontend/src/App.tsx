@@ -14,6 +14,8 @@ import CadastroRestaurante from "./pages/CadastroRestaurante";
 // Layouts e componentes de proteção
 import PainelLayout from './pages/servidor/PainelLayout';
 import ClienteLayout from './pages/cliente/ClienteLayout';
+import ProtectedRouteCliente from './components/ProtectedRouteCliente'; // Importa a nova proteção
+
 import { MeusPedidos } from "./pages/cliente/MeusPedidos";
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -68,13 +70,17 @@ export default function App() {
     
         {/* --- ROTAS DO CLIENTE --- */}
         <Route element={<ClienteLayout />}>
+          {/* Rotas que TODOS podem ver (logados ou não) */}
           <Route path="/restaurantes" element={<Restaurantes />} />
           <Route path="/restaurantes/:id" element={<Catalogo />} />
-          <Route path="/carrinho" element={<Carrinho />} />
-          <Route path="/meus-pedidos" element={<MeusPedidos />} />
-          <Route path="/minha-conta/perfil" element={<MeuPerfil />} />
-          <Route path="/minha-conta/enderecos" element={<MeusEnderecos />} />
-
+          
+          {/* Rotas que APENAS CLIENTES LOGADOS podem ver */}
+          <Route element={<ProtectedRouteCliente />}>
+            <Route path="/carrinho" element={<Carrinho />} />
+            <Route path="/meus-pedidos" element={<MeusPedidos />} />
+            <Route path="/minha-conta/perfil" element={<MeuPerfil />} />
+            <Route path="/minha-conta/enderecos" element={<MeusEnderecos />} />
+          </Route>
         </Route>
 
         {/* --- ROTAS PROTEGIDAS DO PAINEL DO RESTAURANTE --- */}

@@ -30,7 +30,20 @@ router.get('/', async (req: Request, res: Response): Promise<any> => {
   */
 
   try {
-    const result = await pool.query('SELECT * FROM Restaurante;');
+    const result = await pool.query(`
+      SELECT 
+        r.*, 
+        COALESCE(
+          (SELECT json_agg(hf.*) 
+           FROM Hora_Funcionamente hf 
+           WHERE hf.id_restaurante = r.id_restaurante), 
+          '[]'::json
+        ) AS horarios
+      FROM 
+        Restaurante r
+      GROUP BY 
+        r.id_restaurante;
+    `);
 
     if (result.rowCount === 0) {
       return res.status(404).json({ message: 'Nenhum restaurante foi encontrado.' });

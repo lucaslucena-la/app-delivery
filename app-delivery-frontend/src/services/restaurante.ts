@@ -8,8 +8,17 @@ export type Restaurante = {
   endereco: string;
   telefone: string;
   id_usuario: number; // FK para usuário dono do restaurante
+  horarios: Horario[];
+
 };
 
+export type Horario = {
+  id_horario: number;
+  dia_da_semana: string; // Ex: "Segunda", "Terca-feira"
+  hora_abertura: string; // Formato: "2025-09-16T18:00:00.000Z"
+  hora_fechamento: string; // Formato: "2025-09-17T02:00:00.000Z"
+  id_restaurante: number;
+}
 
 // Estrutura mínima usada na criação de um restaurante (sem id_usuario/id_restaurante)
 export type RestauranteInput = {

@@ -35,13 +35,18 @@ export default function ClienteLayout() {
   const handleLogout = () => {
     clearUser();
     navigate('/');
+    window.location.reload(); // força a atualização da página
+
   };
+
+  const logoLinkDestination = (user && !user.is_restaurante) ? "/restaurantes" : "/";
+
 
   return (
     <div className={styles.layout}>
       <header className={styles.header}>
         <div className={styles.container}>
-            <Link to="/" className={styles.logo}>
+            <Link to= {logoLinkDestination} className={styles.logo}>
             FlashFood
             </Link>
           <nav className={styles.nav}>

@@ -1,0 +1,16 @@
+.statusBadge {
+  font-size: 0.8rem;
+  font-weight: bold;
+  padding: 0.3rem 0.7rem;
+  border-radius: 12px;
+  color: white;
+  text-transform: uppercase;
+}
+
+.aberto {
+  background-color: #28a745; /* Verde */
+}
+
+.fechado {
+  background-color: #dc3545; /* Vermelho */
+}

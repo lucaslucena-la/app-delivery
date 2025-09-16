@@ -603,15 +603,18 @@ router.get('/:id', async (req: Request, res: Response): Promise<any> => {
 
     const result = await pool.query(
       `SELECT
-         r.id_restaurante,
-         r.nome,
-         r.endereco,
-         r.telefone,
+         r.*,
          u.email,
-         r.id_usuario
+         COALESCE(
+           (SELECT json_agg(hf.*)
+            FROM Hora_Funcionamente hf
+            WHERE hf.id_restaurante = r.id_restaurante),
+           '[]'::json
+         ) AS horarios
        FROM Restaurante r
        JOIN Usuario u ON r.id_usuario = u.id_usuario
-       WHERE r.id_restaurante = $1;`,
+       WHERE r.id_restaurante = $1
+       GROUP BY r.id_restaurante, u.email;`,
       [restauranteId]
     );
 
@@ -861,7 +864,6 @@ router.put('/:id_restaurante/pedido/:id_pedido/status', async (req: Request, res
   }
 });
 
-// --- ROTA PARA O DASHBOARD 
 router.get('/:id/dashboard', async (req: Request, res: Response): Promise<any> => {
   /*
     #swagger.tags = ['Restaurante']
@@ -959,6 +961,57 @@ router.get('/:id/dashboard', async (req: Request, res: Response): Promise<any> =
   } catch (e) {
     console.error("Erro ao buscar dados do dashboard:", e);
     return res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+router.put('/:id/horarios', async (req: Request, res: Response): Promise<any> => {
+  /*
+    #swagger.tags = ['Restaurante']
+    #swagger.summary = 'Atualiza a grade de horários de funcionamento de um restaurante.'
+    #swagger.parameters['id'] = { in: 'path', required: true, type: 'integer' }
+    #swagger.parameters['body'] = {
+      in: 'body',
+      required: true,
+      schema: [{
+        dia_da_semana: 'Segunda-feira',
+        hora_abertura: '18:00:00',
+        hora_fechamento: '23:00:00'
+      }]
+    }
+  */
+  const { id } = req.params;
+  const horarios = req.body; // Espera um array de objetos de horário
+
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+
+    // 1. Deleta os horários antigos para garantir uma substituição limpa
+    await client.query('DELETE FROM Hora_Funcionamente WHERE id_restaurante = $1', [id]);
+
+    // 2. Insere os novos horários
+    for (const horario of horarios) {
+      if (horario.hora_abertura && horario.hora_fechamento) {
+        // A data é um placeholder, apenas a hora importa
+        const abertura = `2024-01-01 ${horario.hora_abertura}`;
+        const fechamento = `2024-01-01 ${horario.hora_fechamento}`;
+        
+        await client.query(
+          `INSERT INTO Hora_Funcionamente (id_restaurante, dia_da_semana, hora_abertura, hora_fechamento) VALUES ($1, $2, $3, $4)`,
+          [id, horario.dia_da_semana, abertura, fechamento]
+        );
+      }
+    }
+
+    await client.query('COMMIT');
+    res.status(200).json({ message: 'Horários atualizados com sucesso!' });
+
+  } catch (e) {
+    await client.query('ROLLBACK');
+    console.error("Erro ao atualizar horários:", e);
+    res.status(500).json({ message: 'Internal server error' });
+  } finally {
+    client.release();
   }
 });
 

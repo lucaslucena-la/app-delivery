@@ -9,18 +9,26 @@ export type Restaurante = {
   telefone: string;
   id_usuario: number; // FK para usuário dono do restaurante
   horarios: Horario[];
-
 };
 
+// Representa os dados de horário como vêm do BANCO DE DADOS
 export type Horario = {
   id_horario: number;
-  dia_da_semana: string; // Ex: "Segunda", "Terca-feira"
-  hora_abertura: string; // Formato: "2025-09-16T18:00:00.000Z"
-  hora_fechamento: string; // Formato: "2025-09-17T02:00:00.000Z"
+  dia_da_semana: string;
+  hora_abertura: string; // Formato de timestamp completo
+  hora_fechamento: string; // Formato de timestamp completo
   id_restaurante: number;
-}
+};
 
-// Estrutura mínima usada na criação de um restaurante (sem id_usuario/id_restaurante)
+// --- NOVO TIPO ---
+// Representa os dados de horário que o FRONT-END ENVIA para a API
+export type HorarioPayload = {
+  dia_da_semana: string;
+  hora_abertura: string | null; // Formato "HH:mm"
+  hora_fechamento: string | null; // Formato "HH:mm"
+};
+
+// Estrutura mínima usada na criação de um restaurante
 export type RestauranteInput = {
   nome: string;
   email: string;
@@ -31,14 +39,13 @@ export type RestauranteInput = {
 // Estrutura de dados para pratos do restaurante
 export type Prato = {
   id_prato: number;
-  id_restaurante: number; // relação com restaurante
+  id_restaurante: number;
   nome: string;
   descricao: string;
   valor: number;   // em centavos
-  estoque: number; // controle de disponibilidade
+  estoque: number;
   id_categoria: number;
 };
-
 
 export type PratoInput = {
   id_restaurante: number;
@@ -51,13 +58,13 @@ export type PratoInput = {
 
 export type TipoCulinaria = {
   id_tipo_culinaria: number;
-  descricao: string; // Ex: 'italiana', 'japonesa'
+  descricao: string;
 };
 
 export interface PedidoResponse {
   id_pedido: number;
-  nome_cliente: string; // <-- ATUALIZADO
-  id_cliente: number; // A API retorna o ID do cliente
+  nome_cliente: string;
+  id_cliente: number;
   id_restaurante: number;
   data_pedido: string;
   status: string;
@@ -82,7 +89,6 @@ export interface UpdateRestaurantePayload {
   senha?: string;
 }
 
-// Define a estrutura completa dos dados que a rota do dashboard retorna
 export interface DashboardData {
   contagemPedidos: {
     aguardando: number;
@@ -105,35 +111,30 @@ export interface DashboardData {
   }[];
 }
 
-
 export async function getRestauranteDetalhes(id_restaurante: number): Promise<Restaurante> {
   const { data } = await api.get(`/restaurante/${id_restaurante}`);
   return data;
 }
 
-/** Lista todos os restaurantes cadastrados no sistema */
-export async function listarRestaurantes() {
-  const { data } = await api.get<Restaurante[]>("/restaurante");
-  return data; // retorna array de Restaurantes
+export async function listarRestaurantes(): Promise<Restaurante[]> {
+  const { data } = await api.get("/restaurante");
+  return data;
 }
 
-/** Retorna o cardápio (pratos) de um restaurante específico */
-export async function catalogoRestaurante(id: number) {
-  const { data } = await api.get<Prato[]>("/restaurante/catalogo", {
-    params: { id }, // envia como query param
+export async function catalogoRestaurante(id: number): Promise<Prato[]> {
+  const { data } = await api.get("/restaurante/catalogo", {
+    params: { id },
   });
-  return data; // retorna array de Pratos
+  return data;
 }
 
-
-export async function criarRestaurante(payload: RestauranteInput) {
-  const { data } = await api.post<Restaurante>("/restaurante", payload);
-  return data; // retorna o Restaurante recém-criado
+export async function criarRestaurante(payload: RestauranteInput): Promise<Restaurante> {
+  const { data } = await api.post("/restaurante", payload);
+  return data;
 }
   
-export async function criarPrato(payload: PratoInput) {
-  // A rota no backend para criar um prato é /restaurante/prato
-  const { data } = await api.post<Prato>("/restaurante/prato", payload);
+export async function criarPrato(payload: PratoInput): Promise<Prato> {
+  const { data } = await api.post("/restaurante/prato", payload);
   return data;
 }
 
@@ -147,7 +148,7 @@ export async function excluirPrato(id_prato: number): Promise<void> {
 }
 
 export async function getTiposCulinaria(): Promise<TipoCulinaria[]> {
-  const { data } = await api.get<TipoCulinaria[]>("/tipos-culinaria");
+  const { data } = await api.get("/tipos-culinaria");
   return data;
 }
 
@@ -163,6 +164,11 @@ export async function updateRestaurante(id_restaurante: number, payload: UpdateR
 
 export async function getDashboardData(id_restaurante: number): Promise<DashboardData> {
   const { data } = await api.get(`/restaurante/${id_restaurante}/dashboard`);
+  return data;
+}
+
+export async function updateHorarios(id_restaurante: number, horarios: HorarioPayload[]) {
+  const { data } = await api.put(`/restaurante/${id_restaurante}/horarios`, horarios);
   return data;
 }
 

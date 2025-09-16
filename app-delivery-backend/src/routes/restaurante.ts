@@ -848,4 +848,124 @@ router.put('/:id_restaurante/pedido/:id_pedido/status', async (req: Request, res
   }
 });
 
+// --- ROTA PARA O DASHBOARD 
+router.get('/:id/dashboard', async (req: Request, res: Response): Promise<any> => {
+  /*
+    #swagger.tags = ['Restaurante']
+    #swagger.summary = 'Retorna os dados consolidados para o dashboard de um restaurante.'
+    #swagger.parameters['id'] = { in: 'path', required: true, type: 'integer', description: 'ID do restaurante.' }
+    #swagger.responses[200] = {
+      description: 'Dados do dashboard retornados com sucesso.',
+      schema: {
+        contagemPedidos: {
+          aguardando: 5,
+          em_preparo: 8,
+          a_caminho: 3
+        },
+        metricasHoje: {
+          faturamento: 157050,
+          totalPedidos: 25
+        },
+        estoqueBaixo: [
+          { id_prato: 12, nome: 'Cheesecake de Morango', estoque: 4 }
+        ],
+        ultimasAvaliacoes: [
+          { nome_cliente: 'Maria S.', nota: 5, comentario: 'Excelente! Chegou rápido e quente.' }
+        ]
+      }
+    }
+    #swagger.responses[400] = { description: 'ID do restaurante inválido.' }
+    #swagger.responses[404] = { description: 'Restaurante não encontrado.' }
+    #swagger.responses[500] = { description: 'Erro interno do servidor.' }
+  */
+  const { id } = req.params;
+
+  try {
+    const restauranteId = parseInt(id, 10);
+    if (isNaN(restauranteId)) {
+      return res.status(400).json({ message: 'ID do restaurante inválido.' });
+    }
+
+    // --- 1. Contagem de Pedidos por Status ---
+    const statusResult = await pool.query(
+      `SELECT 
+         status, 
+         COUNT(id_pedido)::int as contagem 
+       FROM Pedido 
+       WHERE 
+         id_restaurante = $1 
+         AND status IN ('pedido_esperando_ser_aceito', 'em_preparo', 'a_caminho')
+       GROUP BY status;`,
+      [restauranteId]
+    );
+
+    const contagemPedidos = {
+      aguardando: 0,
+      em_preparo: 0,
+      a_caminho: 0,
+    };
+    statusResult.rows.forEach(row => {
+      if (row.status === 'pedido_esperando_ser_aceito') contagemPedidos.aguardando = row.contagem;
+      if (row.status === 'em_preparo') contagemPedidos.em_preparo = row.contagem;
+      if (row.status === 'a_caminho') contagemPedidos.a_caminho = row.contagem;
+    });
+
+
+    // --- 2. Métricas Financeiras do Dia ---
+    const metricasResult = await pool.query(
+      `SELECT 
+         COALESCE(SUM(valor), 0)::float as faturamento, 
+         COUNT(id_pedido)::int as totalPedidos 
+       FROM Pedido 
+       WHERE 
+         id_restaurante = $1 
+         AND status = 'completo' 
+         AND data_pedido >= CURRENT_DATE;`,
+      [restauranteId]
+    );
+    const metricasHoje = metricasResult.rows[0];
+
+
+    // --- 3. Itens com Estoque Baixo ---
+    const estoqueResult = await pool.query(
+      `SELECT id_prato, nome, estoque 
+       FROM Lista_de_Pratos 
+       WHERE id_restaurante = $1 AND estoque < 10
+       ORDER BY estoque ASC LIMIT 5;`,
+      [restauranteId]
+    );
+    const estoqueBaixo = estoqueResult.rows;
+
+
+    // --- 4. Últimas Avaliações (AGORA ATIVADO) ---
+    const avaliacoesResult = await pool.query(
+        `SELECT 
+           a.nota, a.comentarios AS comentario, c.nome AS nome_cliente
+         FROM Avaliacoes a
+         JOIN Cliente c ON a.id_cliente = c.id_cliente
+         WHERE a.id_restaurante = $1
+         ORDER BY a.data DESC LIMIT 3;`,
+        [restauranteId]
+    );
+    const ultimasAvaliacoes = avaliacoesResult.rows;
+    
+
+    // --- Monta a Resposta Final ---
+    const dashboardData = {
+      contagemPedidos,
+      metricasHoje,
+      estoqueBaixo,
+      ultimasAvaliacoes,
+    };
+
+    return res.status(200).json(dashboardData);
+
+  } catch (e) {
+    console.error("Erro ao buscar dados do dashboard:", e);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+
 export default router;
+

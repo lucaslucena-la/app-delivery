@@ -888,34 +888,21 @@ router.get('/:id/dashboard', async (req: Request, res: Response): Promise<any> =
 
     // --- 1. Contagem de Pedidos por Status ---
     const statusResult = await pool.query(
-      `SELECT 
-         status, 
-         COUNT(id_pedido)::int as contagem 
-       FROM Pedido 
-       WHERE 
-         id_restaurante = $1 
-         AND status IN ('pedido_esperando_ser_aceito', 'em_preparo', 'a_caminho')
-       GROUP BY status;`,
+      `SELECT status, COUNT(id_pedido)::int as contagem FROM Pedido WHERE id_restaurante = $1 AND status IN ('pedido_esperando_ser_aceito', 'em_preparacao', 'a_caminho') GROUP BY status;`,
       [restauranteId]
     );
-
-    const contagemPedidos = {
-      aguardando: 0,
-      em_preparo: 0,
-      a_caminho: 0,
-    };
+    const contagemPedidos = { aguardando: 0, em_preparo: 0, a_caminho: 0 };
     statusResult.rows.forEach(row => {
       if (row.status === 'pedido_esperando_ser_aceito') contagemPedidos.aguardando = row.contagem;
-      if (row.status === 'em_preparo') contagemPedidos.em_preparo = row.contagem;
+      if (row.status === 'em_preparacao') contagemPedidos.em_preparo = row.contagem;
       if (row.status === 'a_caminho') contagemPedidos.a_caminho = row.contagem;
     });
-
 
     // --- 2. Métricas Financeiras do Dia ---
     const metricasResult = await pool.query(
       `SELECT 
-         COALESCE(SUM(valor), 0)::float as faturamento, 
-         COUNT(id_pedido)::int as totalPedidos 
+         COALESCE(SUM(valor), 0)::float as "faturamento", 
+         COUNT(id_pedido)::int as "totalPedidos" 
        FROM Pedido 
        WHERE 
          id_restaurante = $1 
@@ -925,22 +912,19 @@ router.get('/:id/dashboard', async (req: Request, res: Response): Promise<any> =
     );
     const metricasHoje = metricasResult.rows[0];
 
-
     // --- 3. Itens com Estoque Baixo ---
     const estoqueResult = await pool.query(
-      `SELECT id_prato, nome, estoque 
-       FROM Lista_de_Pratos 
-       WHERE id_restaurante = $1 AND estoque < 10
-       ORDER BY estoque ASC LIMIT 5;`,
+      `SELECT id_prato, nome, estoque FROM Lista_de_Pratos WHERE id_restaurante = $1 AND estoque < 10 ORDER BY estoque ASC LIMIT 5;`,
       [restauranteId]
     );
     const estoqueBaixo = estoqueResult.rows;
 
-
-    // --- 4. Últimas Avaliações (AGORA ATIVADO) ---
+    // --- 4. Últimas Avaliações ---
     const avaliacoesResult = await pool.query(
         `SELECT 
-           a.nota, a.comentarios AS comentario, c.nome AS nome_cliente
+           a.nota, 
+           a.comentarios AS comentario, 
+           c.nome AS nome_cliente -- ALTERADO DE c.nome_completo PARA c.nome
          FROM Avaliacoes a
          JOIN Cliente c ON a.id_cliente = c.id_cliente
          WHERE a.id_restaurante = $1
@@ -949,7 +933,6 @@ router.get('/:id/dashboard', async (req: Request, res: Response): Promise<any> =
     );
     const ultimasAvaliacoes = avaliacoesResult.rows;
     
-
     // --- Monta a Resposta Final ---
     const dashboardData = {
       contagemPedidos,

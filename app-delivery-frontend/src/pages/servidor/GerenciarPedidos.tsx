@@ -104,6 +104,7 @@ export function GerenciarPedidos() {
                   <option value="pedido_esperando_ser_aceito">Pendente</option>
                   <option value="em_preparacao">Em Preparação</option>
                   <option value="a_caminho">A Caminho</option>
+                  <option value="completo">Completo</option>
                   
                 </select>
                 <button onClick={() => toggleDetalhes(pedido.id_pedido)} className={styles.detailsButton}>

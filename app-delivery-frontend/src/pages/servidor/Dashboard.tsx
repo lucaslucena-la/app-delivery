@@ -11,29 +11,12 @@ import {
   AlertTriangle,
   Star,
 } from 'lucide-react';
+import { getUser } from '../../store/auth';
+// --- 1. Importa a nova função de serviço e o tipo ---
+import { getDashboardData, type DashboardData } from '../../services/restaurante';
 
-// Dados de exemplo que virão da sua API no futuro
-const mockData = {
-  contagemPedidos: {
-    aguardando: 5,
-    em_preparo: 8,
-    a_caminho: 3,
-  },
-  metricasHoje: {
-    faturamento: 157050, // Em centavos
-    totalPedidos: 25,
-  },
-  estoqueBaixo: [
-    { id_prato: 12, nome: 'Cheesecake de Morango', estoque: 4 },
-    { id_prato: 5, nome: 'Suco de Laranja', estoque: 8 },
-  ],
-  ultimasAvaliacoes: [
-    { nome_cliente: 'Maria S.', nota: 5, comentario: 'Excelente! Chegou rápido e quente.' },
-    { nome_cliente: 'João P.', nota: 4, comentario: 'Muito bom, mas a embalagem amassou.' },
-  ],
-};
 
-// Componente para renderizar estrelas de avaliação
+// Componente para renderizar estrelas de avaliação (mantido)
 const StarRating = ({ rating }: { rating: number }) => (
   <div className={styles.starRating}>
     {[...Array(5)].map((_, i) => (
@@ -43,17 +26,44 @@ const StarRating = ({ rating }: { rating: number }) => (
 );
 
 export default function Dashboard() {
-  const [data, setData] = useState<typeof mockData | null>(null);
+  // --- 2. O estado agora usa o novo tipo ---
+  const [data, setData] = useState<DashboardData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Simula o carregamento dos dados
-    setTimeout(() => {
-      setData(mockData);
-    }, 500);
-  }, []);
+    // --- 3. A lógica de carregamento agora chama a API ---
+    const carregarDashboard = async () => {
+      const user = getUser();
+      if (!user?.id_restaurante) {
+        setError("Usuário de restaurante não identificado.");
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        const dashboardData = await getDashboardData(user.id_restaurante);
+        setData(dashboardData);
+      } catch (err: any) {
+        setError(err?.response?.data?.message || "Não foi possível carregar os dados do painel.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    carregarDashboard();
+  }, []); // Roda apenas uma vez ao carregar
+
+  if (isLoading) {
+    return <div className={styles.loading}>Carregando painel...</div>;
+  }
+  
+  if (error) {
+    return <div className={styles.loading}>{error}</div>;
+  }
 
   if (!data) {
-    return <div className={styles.loading}>Carregando...</div>;
+    return <div className={styles.loading}>Nenhum dado para exibir.</div>;
   }
   
   const ticketMedio = data.metricasHoje.totalPedidos > 0 ? data.metricasHoje.faturamento / data.metricasHoje.totalPedidos : 0;
@@ -62,7 +72,8 @@ export default function Dashboard() {
     <div className={styles.dashboard}>
       <header className={styles.header}>
         <h1>Visão Geral</h1>
-        <p>Segunda, 15 de Setembro de 2025</p>
+        {/* Data pode ser dinâmica no futuro */}
+        <p>{new Date().toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
       </header>
 
       {/* Seção 1: Visão Geral dos Pedidos */}
@@ -125,49 +136,35 @@ export default function Dashboard() {
       <div className={styles.gridTwoCols}>
         <div className={styles.listCard}>
           <h3 className={styles.listCardTitle}><AlertTriangle size={20} /> Atenção ao Estoque</h3>
-          <ul>
-            {data.estoqueBaixo.map(item => (
-              <li key={item.id_prato}>
-                <Link to="/painel/cardapio">{item.nome}</Link>
-                <span>{item.estoque} un.</span>
-              </li>
-            ))}
-          </ul>
+          {data.estoqueBaixo.length > 0 ? (
+            <ul>
+              {data.estoqueBaixo.map(item => (
+                <li key={item.id_prato}>
+                  <Link to="/painel/cardapio">{item.nome}</Link>
+                  <span>{item.estoque} un.</span>
+                </li>
+              ))}
+            </ul>
+          ) : <p>Nenhum item com estoque baixo.</p>}
         </div>
         <div className={styles.listCard}>
           <h3 className={styles.listCardTitle}><Star size={20} /> Últimas Avaliações</h3>
-          <ul>
-            {data.ultimasAvaliacoes.map((avaliacao, index) => (
-              <li key={index} className={styles.avaliacaoItem}>
-                <div>
-                  <strong>{avaliacao.nome_cliente}</strong>
-                  <p>"{avaliacao.comentario}"</p>
-                </div>
-                <StarRating rating={avaliacao.nota} />
-              </li>
-            ))}
-          </ul>
+          {data.ultimasAvaliacoes.length > 0 ? (
+            <ul>
+              {data.ultimasAvaliacoes.map((avaliacao, index) => (
+                <li key={index} className={styles.avaliacaoItem}>
+                  <div>
+                    <strong>{avaliacao.nome_cliente}</strong>
+                    <p>"{avaliacao.comentario}"</p>
+                  </div>
+                  <StarRating rating={avaliacao.nota} />
+                </li>
+              ))}
+            </ul>
+          ) : <p>Nenhuma avaliação recente.</p>}
         </div>
       </div>
     </div>
   );
 }
-
-
-//Rotas necessárias para atender a esta página:
-
-/*Rota GET /restaurante/:id/dashboard para buscar todos os dados do dashboard de uma só vez.
-
-Dados necessários:
-
-Contagem de pedidos por status (aguardando, em preparo, a caminho).
-
-Métricas do dia (faturamento, total de pedidos).
-
-Lista de itens com estoque baixo (nome do prato, quantidade em estoque).
-
-Últimas avaliações recebidas (nome do cliente, nota, comentário).
-
-*/
-
 

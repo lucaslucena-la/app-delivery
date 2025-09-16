@@ -73,12 +73,30 @@ export interface UpdateRestaurantePayload {
   senha?: string;
 }
 
-// --- NOVA FUNÇÃO ADICIONADA ---
-/**
- * Busca os detalhes completos de um restaurante específico.
- * @param id_restaurante O ID do restaurante a ser buscado.
- * @returns Os detalhes do restaurante.
- */
+// Define a estrutura completa dos dados que a rota do dashboard retorna
+export interface DashboardData {
+  contagemPedidos: {
+    aguardando: number;
+    em_preparo: number;
+    a_caminho: number;
+  };
+  metricasHoje: {
+    faturamento: number;
+    totalPedidos: number;
+  };
+  estoqueBaixo: {
+    id_prato: number;
+    nome: string;
+    estoque: number;
+  }[];
+  ultimasAvaliacoes: {
+    nome_cliente: string;
+    nota: number;
+    comentario: string;
+  }[];
+}
+
+
 export async function getRestauranteDetalhes(id_restaurante: number): Promise<Restaurante> {
   const { data } = await api.get(`/restaurante/${id_restaurante}`);
   return data;
@@ -131,6 +149,11 @@ export async function getPedidosRestaurante(id_restaurante: number): Promise<Ped
 
 export async function updateRestaurante(id_restaurante: number, payload: UpdateRestaurantePayload) {
   const { data } = await api.put(`/restaurante/${id_restaurante}`, payload);
+  return data;
+}
+
+export async function getDashboardData(id_restaurante: number): Promise<DashboardData> {
+  const { data } = await api.get(`/restaurante/${id_restaurante}/dashboard`);
   return data;
 }
 

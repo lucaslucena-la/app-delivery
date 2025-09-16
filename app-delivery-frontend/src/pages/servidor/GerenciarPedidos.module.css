@@ -63,6 +63,8 @@
 .pedido_esperando_ser_aceito { background-color: #ffc107; color: #333; }
 .em_preparacao { background-color: #007bff; color: white; }
 .a_caminho { background-color: #00b90c; color: white; }
+.completo { background-color: #2837a7; color: white; }
+
 
 .pedidoActions {
   display: flex;

@@ -1,17 +1,45 @@
-import { Link, Outlet } from 'react-router-dom';
+import React, { useState, useRef, useEffect } from 'react';
+import { Link, Outlet, useNavigate } from 'react-router-dom';
 import styles from './ClienteLayout.module.css';
-// Ícones
-import { FaShoppingCart, FaUser, FaClipboardList } from 'react-icons/fa'; 
-// --- 1. Importa o hook do nosso contexto do carrinho ---
+import { FaShoppingCart, FaUser, FaClipboardList } from 'react-icons/fa';
 import { useCarrinho } from '../../context/CarrinhoContext.tsx';
+import { clearUser, getUser } from '../../store/auth.ts';
+
+// Hook customizado para detectar cliques fora de um elemento
+function useClickOutside(ref: React.RefObject<HTMLDivElement>, handler: () => void) {
+  useEffect(() => {
+    const listener = (event: MouseEvent | TouchEvent) => {
+      if (!ref.current || ref.current.contains(event.target as Node)) {
+        return;
+      }
+      handler();
+    };
+    document.addEventListener('mousedown', listener);
+    document.addEventListener('touchstart', listener);
+    return () => {
+      document.removeEventListener('mousedown', listener);
+      document.removeEventListener('touchstart', listener);
+    };
+  }, [ref, handler]);
+}
 
 export default function ClienteLayout() {
-  // --- 2. Usa o hook para acessar os itens do carrinho ---
   const { items } = useCarrinho();
+  const navigate = useNavigate();
+  const user = getUser();
 
-  // --- 3. Calcula a quantidade total de itens no carrinho ---
-  // Usamos 'reduce' para somar a quantidade de cada item, não apenas contar os produtos diferentes.
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Fecha o menu ao clicar fora
+  useClickOutside(dropdownRef, () => setIsMenuOpen(false));
+
   const cartItemCount = items.reduce((total, item) => total + item.quantidade, 0);
+
+  const handleLogout = () => {
+    clearUser();
+    navigate('/');
+  };
 
   return (
     <div className={styles.layout}>
@@ -25,14 +53,31 @@ export default function ClienteLayout() {
               <FaClipboardList />
               <span>Meus Pedidos</span>
             </Link>
-            {/* O link para Minha Conta continua aqui, para quando a página for criada */}
-            <Link to="/minha-conta" className={styles.navLink}>
-              <FaUser />
-              <span>Minha Conta</span>
-            </Link>
+            
+            {/* --- BOTÃO MINHA CONTA COM DROPDOWN --- */}
+            <div className={styles.dropdownContainer} ref={dropdownRef}>
+              <button onClick={() => setIsMenuOpen(!isMenuOpen)} className={styles.navLink}>
+                <FaUser />
+                <span>{user?.username || 'Minha Conta'}</span>
+              </button>
+              
+              {isMenuOpen && (
+                <div className={styles.dropdownMenu}>
+                  <Link to="/minha-conta/perfil" className={styles.dropdownItem} onClick={() => setIsMenuOpen(false)}>
+                    Meu Perfil
+                  </Link>
+                  <Link to="/minha-conta/enderecos" className={styles.dropdownItem} onClick={() => setIsMenuOpen(false)}>
+                    Meus Endereços
+                  </Link>
+                  <button onClick={handleLogout} className={`${styles.dropdownItem} ${styles.logoutButton}`}>
+                    Sair
+                  </button>
+                </div>
+              )}
+            </div>
+            
             <Link to="/carrinho" className={`${styles.navLink} ${styles.cartLink}`}>
               <FaShoppingCart />
-              {/* Agora, o contador é dinâmico e só aparece se houver itens */}
               {cartItemCount > 0 && <span className={styles.cartBadge}>{cartItemCount}</span>}
             </Link>
           </nav>
@@ -44,9 +89,6 @@ export default function ClienteLayout() {
           <Outlet />
         </div>
       </main>
-
-      <footer className={styles.footer}>
-      </footer>
     </div>
   );
 }

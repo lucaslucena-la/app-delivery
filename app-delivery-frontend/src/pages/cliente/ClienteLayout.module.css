@@ -91,3 +91,63 @@
   background-color: #1f2937;
   color: #d1d5db;
 }
+
+
+.dropdownContainer {
+  position: relative; /* Essencial para posicionar o menu */
+}
+
+/* Transforma o botão do navLink para se parecer com os outros */
+.dropdownContainer button.navLink {
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1rem;
+  padding: 0;
+  font-family: inherit;
+}
+
+
+.dropdownMenu {
+  position: absolute;
+  top: 150%; /* Posição abaixo do botão */
+  right: 0;
+  background-color: rgb(237, 237, 237);
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  min-width: 180px;
+  z-index: 100;
+  overflow: hidden; /* Garante que os cantos arredondados sejam aplicados nos itens */
+  display: flex;
+  flex-direction: column;
+}
+
+.dropdownItem {
+  padding: 0.8rem 1.2rem;
+  text-decoration: none;
+  color: #333;
+  display: block;
+  text-align: left;
+  transition: background-color 0.2s;
+}
+
+.dropdownItem:hover {
+  background-color: #f8f9fa;
+}
+
+.logoutButton {
+  width: 100%;
+  border: none;
+  background: none;
+  font-size: inherit;
+  font-family: inherit;
+  cursor: pointer;
+  color: #dc3545; /* Cor vermelha para destacar a ação de sair */
+}
+
+.logoutButton:hover {
+  background-color: rgba(220, 53, 69, 0.05);
+}

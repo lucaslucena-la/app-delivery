@@ -26,6 +26,9 @@ import { GerenciarPedidos } from "./pages/servidor/GerenciarPedidos";
 import Carrinho from "./pages/cliente/Carrinho";
 import { CarrinhoProvider } from './context/CarrinhoContext';
 
+import MeuPerfil from './pages/cliente/MeuPerfil.tsx';
+import MeusEnderecos from './pages/cliente/MeusEnderecos.tsx';
+
 
 // Lógica de autenticação
 import { getUser } from "./store/auth";
@@ -69,6 +72,8 @@ export default function App() {
           <Route path="/restaurantes/:id" element={<Catalogo />} />
           <Route path="/carrinho" element={<Carrinho />} />
           <Route path="/meus-pedidos" element={<MeusPedidos />} />
+          <Route path="/minha-conta/perfil" element={<MeuPerfil />} />
+          <Route path="/minha-conta/enderecos" element={<MeusEnderecos />} />
 
         </Route>
 

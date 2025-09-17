@@ -1,20 +1,18 @@
 import React, { useState, useEffect, type FormEvent } from 'react';
-import { getUser } from '../../store/auth';
-import { getClienteDetalhes, updateCliente } from '../../services/cliente';
+import { getUser } from '../../store/auth.ts';
+import { getClienteDetalhes, updateCliente } from '../../services/cliente.ts';
 import styles from './MeuPerfil.module.css';
 
 export default function MeuPerfil() {
-  // Estados para os dados do perfil
+  // --- NOVO ESTADO PARA USERNAME ---
+  const [username, setUsername] = useState('');
   const [nomeCompleto, setNomeCompleto] = useState('');
   const [email, setEmail] = useState('');
   const [telefone, setTelefone] = useState('');
   const [cpf, setCpf] = useState('');
-
-  // Estados para a alteração de senha
   const [senhaAtual, setSenhaAtual] = useState('');
   const [novaSenha, setNovaSenha] = useState('');
   
-  // Estados de controle
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error', message: string } | null>(null);
@@ -25,6 +23,8 @@ export default function MeuPerfil() {
       if (user && user.id_cliente) {
         try {
           const dados = await getClienteDetalhes(user.id_cliente);
+          // --- ATUALIZADO PARA CARREGAR O USERNAME ---
+          setUsername(dados.username);
           setNomeCompleto(dados.nome);
           setEmail(dados.email);
           setTelefone(dados.telefone);
@@ -49,19 +49,22 @@ export default function MeuPerfil() {
 
     const user = getUser();
     if (!user?.id_cliente) {
-      setFeedback({ type: 'error', message: 'Não foi possível identificar o cliente.' });
-      setIsSubmitting(false);
+      // ... (tratamento de erro)
       return;
     }
 
-    const payload: any = { nome: nomeCompleto, email, telefone };
-    if (novaSenha && senhaAtual) {
-      payload.senha_atual = senhaAtual;
-      payload.nova_senha = novaSenha;
-    } else if (novaSenha && !senhaAtual) {
+    // --- PAYLOAD ATUALIZADO ---
+    const payload: any = { nome: nomeCompleto, email, telefone, username };
+    
+    // Lógica explícita para a senha
+    if (novaSenha && !senhaAtual) {
       setFeedback({ type: 'error', message: 'Por favor, informe sua senha atual para definir uma nova.' });
       setIsSubmitting(false);
       return;
+    }
+    if (novaSenha && senhaAtual) {
+      payload.senha_atual = senhaAtual;
+      payload.nova_senha = novaSenha;
     }
 
     try {
@@ -87,6 +90,11 @@ export default function MeuPerfil() {
       <form onSubmit={handleSave} className={styles.form}>
         <section className={styles.card}>
           <h2>Dados Pessoais</h2>
+          {/* --- NOVO CAMPO DE USERNAME --- */}
+          <div className={styles.formGroup}>
+            <label htmlFor="username">Nome de Login</label>
+            <input id="username" type="text" value={username} onChange={e => setUsername(e.target.value)} required />
+          </div>
           <div className={styles.formGroup}>
             <label htmlFor="nomeCompleto">Nome Completo</label>
             <input id="nomeCompleto" type="text" value={nomeCompleto} onChange={e => setNomeCompleto(e.target.value)} required />

@@ -6,6 +6,7 @@ export interface ClienteDetalhes {
   email: string;
   telefone: string;
   cpf: string;
+  username: string;
 }
 
 // Interface para os dados enviados na atualização

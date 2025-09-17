@@ -4,17 +4,13 @@ import bcrypt from 'bcrypt';
 
 const router = Router();
 
-// --- ROTA PARA BUSCAR DADOS DO CLIENTE ---
+
 router.get('/:id_cliente', async (req: Request, res: Response): Promise<any> => {
-  /*
-    #swagger.tags = ['Cliente']
-    #swagger.summary = 'Retorna os detalhes de um cliente específico.'
-  */
   const { id_cliente } = req.params;
   try {
     const result = await pool.query(
       `SELECT 
-         c.id_cliente, c.nome, c.telefone, c.cpf, u.email
+         c.id_cliente, c.nome, c.telefone, c.cpf, u.email, u.usuario AS username
        FROM Cliente c
        JOIN Usuario u ON c.id_usuario = u.id_usuario
        WHERE c.id_cliente = $1;`,
@@ -29,24 +25,18 @@ router.get('/:id_cliente', async (req: Request, res: Response): Promise<any> => 
   }
 });
 
-// --- ROTA PARA ATUALIZAR DADOS DO CLIENTE (COM TRANSAÇÃO) ---
 router.put('/:id_cliente', async (req: Request, res: Response): Promise<any> => {
-  /*
-    #swagger.tags = ['Cliente']
-    #swagger.summary = 'Atualiza as informações de um cliente.'
-  */
   const { id_cliente } = req.params;
-  const { nome, email, telefone, senha_atual, nova_senha } = req.body;
+  const { nome, email, telefone, username, senha_atual, nova_senha } = req.body;
 
-  if (!nome || !email || !telefone) {
-    return res.status(400).json({ message: 'Nome, email e telefone são obrigatórios.' });
+  if (!nome || !email || !telefone || !username) {
+    return res.status(400).json({ message: 'Nome, email, telefone e nome de usuário são obrigatórios.' });
   }
 
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
 
-    // 1. Busca o id_usuario e a senha atual
     const userResult = await client.query(
       `SELECT u.id_usuario, u.senha FROM Usuario u JOIN Cliente c ON u.id_usuario = c.id_usuario WHERE c.id_cliente = $1`,
       [id_cliente]
@@ -58,18 +48,17 @@ router.put('/:id_cliente', async (req: Request, res: Response): Promise<any> => 
     }
     const { id_usuario, senha: senhaHash } = userResult.rows[0];
 
-    // 2. Atualiza a tabela Cliente
+    // Atualiza a tabela Cliente (apenas nome e telefone)
     await client.query(
       `UPDATE Cliente SET nome = $1, telefone = $2 WHERE id_cliente = $3`,
       [nome, telefone, id_cliente]
     );
 
-    // 3. Atualiza a tabela Usuario
-    const userUpdateFields = ['email = $1'];
-    const userUpdateValues: (string | number)[] = [email];
-    let paramIndex = 2;
+    // Monta a query para atualizar a tabela Usuario
+    const userUpdateFields = ['email = $1', 'usuario = $2'];
+    const userUpdateValues: (string | number)[] = [email, username];
+    let paramIndex = 3;
 
-    // Se a nova senha foi fornecida, verifica a senha atual antes de atualizar
     if (nova_senha) {
       if (!senha_atual) {
         await client.query('ROLLBACK');
@@ -91,8 +80,12 @@ router.put('/:id_cliente', async (req: Request, res: Response): Promise<any> => 
     await client.query('COMMIT');
     res.status(200).json({ message: 'Perfil atualizado com sucesso!' });
 
-  } catch (error) {
+  } catch (error: any) {
     await client.query('ROLLBACK');
+    // Trata erro de username/email duplicado
+    if (error.code === '23505') {
+      return res.status(409).json({ message: 'Nome de usuário ou email já está em uso.' });
+    }
     res.status(500).json({ message: 'Erro interno do servidor.' });
   } finally {
     client.release();
@@ -100,3 +93,4 @@ router.put('/:id_cliente', async (req: Request, res: Response): Promise<any> => 
 });
 
 export default router;
+

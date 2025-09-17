@@ -1,0 +1,292 @@
+/* --------- Reset & Base --------- */
+:root {
+  --bg: #0b0d10;
+  --card: #11151a;
+  --muted: #8b98a5;
+  --text: #e8eef4;
+  --brand: #6ee7b7;
+  --brand-700: #10b981;
+  --danger: #ef4444;
+  --success: #22c55e;
+  --border: #1f2630;
+  --ring: rgba(110, 231, 183, 0.35);
+  --nav-h: 62px; /* Navbar height */
+}
+
+* { box-sizing: border-box; }
+html, body, #root { height: 100%; margin: 0; }
+body {
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif;
+  color: var(--text);
+  background: radial-gradient(1200px 800px at 80% -10%, rgba(16, 185, 129, 0.08), transparent 50%), var(--bg);
+}
+
+/* --------- Page Layout --------- */
+.pageLayout {
+  min-height: 100vh;
+  display: grid;
+  grid-template-rows: var(--nav-h) 1fr; /* Header + content */
+  grid-template-columns: 1fr; /* Default for mobile */
+}
+
+/* --------- Header / Navbar --------- */
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background:
+    radial-gradient(650px 300px at 20% 0%, rgba(16, 185, 129, 0.07), transparent 60%),
+    var(--bg);  backdrop-filter: blur(6px);
+  border-bottom: 1px solid var(--border);
+  height: var(--nav-h);
+}
+
+.container {
+  max-width: 1200px;
+  margin-inline: auto;
+  padding: 14px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logo {
+  text-decoration: none;
+  color: var(--text);
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  font-size: clamp(18px, 2.2vw, 22px);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6ch;
+}
+.logo::before {
+  color: var(--brand);
+  filter: drop-shadow(0 0 8px rgba(110, 231, 183, 0.35));
+}
+
+.logo:hover{
+  text-decoration: none;
+}
+
+/* --------- Split (Image | Form) --------- */
+.imagePanel {
+  grid-row: 2; /* Below header */
+  background:
+    linear-gradient(180deg, rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.45)),
+    url("../../public/images/fundo_cadastro_resto.jpeg") center/cover no-repeat;
+  position: relative;
+}
+
+.imageOverlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 48px;
+  color: #f1f6fb;
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.45);
+}
+.imageOverlay h2 {
+  margin: 0 0 8px 0;
+  font-weight: 800;
+  font-size: clamp(22px, 2.8vw, 34px);
+}
+.imageOverlay p {
+  margin: 0;
+  color: #e3edf5cc;
+  font-size: clamp(14px, 1.5vw, 16px);
+}
+
+/* Right side (form) */
+.formPanel {
+  grid-row: 2; /* Below header */
+  background:
+    radial-gradient(650px 300px at 20% 0%, rgba(16, 185, 129, 0.07), transparent 60%),
+    var(--bg);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  border-left: 1px solid var(--border);
+}
+
+.formContainer {
+  width: min(620px, 96%);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0));
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 32px 28px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  margin-top: 32px; /* Ensure form starts below header */
+}
+
+/* Titles */
+.title {
+  margin: 0 0 6px 0;
+  font-size: clamp(22px, 2.4vw, 28px);
+  font-weight: 800;
+  letter-spacing: 0.2px;
+  color: var(--text);
+}
+.subtitle {
+  margin: 0 0 22px 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+/* Form */
+form { display: grid; gap: 16px; }
+.formGroup { display: grid; gap: 8px; }
+.formGroup label {
+  font-size: 13px;
+  color: #c7d3df;
+}
+
+/* Inputs & Select */
+.formGroup input,
+.formGroup select {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: #0f1318;
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+  appearance: none;
+}
+
+/* Placeholders */
+.formGroup input::placeholder { color: #6b7785; }
+
+/* Focus */
+.formGroup input:focus,
+.formGroup select:focus {
+  border-color: var(--brand-700);
+  box-shadow: 0 0 0 4px var(--ring);
+  background: #0e1419;
+}
+
+/* Select custom arrow */
+.formGroup select {
+  background-image:
+    linear-gradient(180deg, transparent 0%, transparent 60%, rgba(255, 255, 255, 0.06) 100%),
+    url("data:image/svg+xml,%3Csvg width='14' height='10' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l6 6 6-6' stroke='%23cfe7de' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center, 0 0;
+  background-size: 14px 10px, cover;
+  padding-right: 38px;
+  cursor: pointer;
+}
+
+/* Remove number/tel arrows in browsers */
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+input[type=number] { -moz-appearance: textfield; }
+input[type=tel] { -webkit-appearance: none; }
+
+/* Divider */
+.divider {
+  border: none;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border), transparent);
+  margin: 6px 0 2px 0;
+}
+
+/* Messages */
+.error, .success {
+  margin: 4px 0 0 0;
+  font-size: 13px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid;
+  background: #0d1217;
+}
+.error { border-color: rgba(239, 68, 68, 0.45); color: #fecaca; }
+.success { border-color: rgba(34, 197, 94, 0.45); color: #bbf7d0; }
+
+/* Submit button */
+.button {
+  margin-top: 6px;
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 14px;
+  border: 1px solid transparent;
+  background: linear-gradient(180deg, var(--brand), var(--brand-700));
+  color: #04130e;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  cursor: pointer;
+  transition: transform 0.06s ease, box-shadow 0.2s ease, filter 0.2s ease;
+  box-shadow: 0 8px 18px rgba(16, 185, 129, 0.25);
+}
+.button:hover { filter: saturate(1.1) brightness(1.05); }
+.button:active { transform: translateY(1px); }
+
+/* Login prompt */
+.loginPrompt {
+  margin: 14px 2px 0;
+  color: var(--muted);
+  font-size: 14px;
+  text-align: center;
+}
+.loginLink {
+  color: var(--brand);
+  font-weight: 700;
+  text-decoration: none;
+  border-bottom: 1px dashed transparent;
+}
+.loginLink:hover { border-bottom-color: var(--brand); }
+
+/* --------- Desktop: header in row 1; image & form in row 2 --------- */
+@media (min-width: 980px) {
+  .pageLayout {
+    grid-template-columns: 1fr 1fr; /* Left | Right */
+    grid-template-rows: var(--nav-h) 1fr; /* Header | Content */
+    height: 100vh;
+  }
+
+  .header {
+    grid-column: 1 / -1; /* Span both columns */
+    grid-row: 1; /* Header row */
+  }
+
+  /* Left: Fixed below header */
+  .imagePanel {
+    grid-column: 1 / 2;
+    grid-row: 2; /* Below header */
+    position: sticky;
+    top: var(--nav-h); /* Stick below navbar */
+    height: calc(100vh - var(--nav-h)); /* Full height minus header */
+  }
+
+  /* Right: Scrollable below header */
+  .formPanel {
+    grid-column: 2 / 3;
+    grid-row: 2; /* Below header */
+    height: calc(100vh - var(--nav-h)); /* Full height minus header */
+    overflow-y: auto;
+    padding: 32px;
+    overscroll-behavior: contain; /* Prevent bounce affecting body */
+  }
+}
+
+/* --------- Tablet: hero on top, form below --------- */
+@media (max-width: 979px) {
+  .imagePanel { min-height: 42vh; position: relative; top: auto; height: auto; }
+  .formPanel { padding: 20px; height: auto; overflow: visible; }
+}
+
+/* --------- Mobile tweaks --------- */
+@media (max-width: 560px) {
+  .container { padding: 12px 16px; }
+  .formContainer { padding: 22px 18px; border-radius: 16px; }
+  .imageOverlay { padding: 28px; }
+}
+
+/* --------- Accessibility: reduced motion --------- */
+@media (prefers-reduced-motion: reduce) {
+  .button { transition: none; }
+  .formGroup input, .formGroup select { transition: none; }
+}

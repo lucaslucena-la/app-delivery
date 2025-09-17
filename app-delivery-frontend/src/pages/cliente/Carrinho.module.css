@@ -1,0 +1,250 @@
+.container {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 20px;
+  background-color: #f8f9fa;
+  min-height: 100vh;
+}
+
+.title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #2d3436;
+  text-align: center;
+  margin-bottom: 40px;
+  position: relative;
+  padding-bottom: 10px;
+}
+
+.title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 3px;
+  background-color: #e74c3c;
+}
+
+.error {
+  font-size: 14px;
+  color: #e74c3c;
+  text-align: center;
+  background: rgba(231, 76, 60, 0.1);
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.success {
+  font-size: 14px;
+  color: #2ecc71;
+  text-align: center;
+  background: rgba(46, 204, 113, 0.1);
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.emptyMessage {
+  font-size: 16px;
+  color: #636e72;
+  text-align: center;
+  padding: 20px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  margin-top: 20px;
+}
+
+.itemsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.item {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  border-bottom: 1px solid #eee;
+}
+
+.itemDetails {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.itemInfo {
+  flex: 1;
+}
+
+.itemName {
+  font-size: 18px;
+  font-weight: 600;
+  color: #2d3436;
+}
+
+.itemPrice {
+  font-size: 14px;
+  color: #636e72;
+  margin-top: 8px;
+}
+
+.quantityControls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.quantityButton {
+    background: #e74c3c;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    width: 32px;
+    height: 32px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.quantityButton:hover {
+  background: #c0392b;
+}
+
+.quantity {
+  font-size: 16px;
+  color: #2d3436;
+}
+
+.removeButton {
+  background: none;
+  border: none;
+  color: #e74c3c;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.removeButton:hover {
+  color: #ff0011;
+  text-decoration: none;
+  background-color: #fff8f8;
+}
+
+.itemSubtotal {
+  font-size: 16px;
+  font-weight: 600;
+  color: #2d3436;
+}
+
+.observationInput {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #333;
+  margin-top: 15px;
+  transition: border-color 0.3s ease;
+}
+
+.observationInput:focus {
+  outline: none;
+  border-color: #e74c3c;
+  box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1);
+}
+
+.paymentSection {
+  margin-top: 2rem;
+}
+
+.sectionTitle {
+  font-size: 20px;
+  font-weight: 600;
+  color: #2d3436;
+  margin-bottom: 12px;
+}
+
+.paymentSelect {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 16px;
+  color: #333;
+  background: white;
+  transition: border-color 0.3s ease;
+}
+
+.paymentSelect:focus {
+  outline: none;
+  border-color: #e74c3c;
+  box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1);
+}
+
+.summarySection {
+  margin-top: 2rem;
+  text-align: right;
+}
+
+.total {
+  font-size: 24px;
+  font-weight: 700;
+  color: #2d3436;
+  margin-bottom: 12px;
+}
+
+.checkoutButton {
+  background: #e74c3c;
+  color: white;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.checkoutButton:hover {
+  background: #c0392b;
+}
+
+@media (max-width: 576px) {
+  .container {
+    padding: 15px;
+  }
+
+  .title {
+    font-size: 24px;
+  }
+
+  .item {
+    padding: 15px;
+  }
+
+  .itemDetails {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .itemSubtotal {
+    text-align: left;
+  }
+
+  .summarySection {
+    text-align: center;
+  }
+}

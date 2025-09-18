@@ -6,7 +6,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
     ports:
-      - "5432:5432"             
+      - "5432:5432"
     volumes:
       - db_data:/var/lib/postgresql/data
     healthcheck:
@@ -33,6 +33,7 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    command: sh -c "npm install -g ts-node && sleep 2 && ts-node src/db/create.ts && ts-node src/db/seed.ts && npm run start"
 
   frontend:
     build:
@@ -41,13 +42,11 @@ services:
     environment:
       NODE_ENV: development
       VITE_API_URL: http://localhost:3001
-
     volumes:
       - "./app-delivery-frontend:/app"
       - /app/node_modules
     ports:
       - "5173:5173"
-    command: ["pnpm", "run", "dev", "--", "--host", "0.0.0.0"]
 
 volumes:
   db_data:

@@ -92,5 +92,84 @@ router.put('/:id_cliente', async (req: Request, res: Response): Promise<any> => 
   }
 });
 
+router.get('/:id_cliente/enderecos', async (req: Request, res: Response): Promise<any> => {
+  /*
+    #swagger.tags = ['Cliente']
+    #swagger.summary = 'Retorna a lista de endereços de um cliente.'
+  */
+  const { id_cliente } = req.params;
+  try {
+    const result = await pool.query(
+      'SELECT * FROM Endereco_Cliente WHERE id_cliente = $1 ORDER BY id_endereco DESC', 
+      [id_cliente]
+    );
+    res.status(200).json(result.rows);
+  } catch (error) {
+    res.status(500).json({ message: 'Erro ao buscar endereços.' });
+  }
+});
+
+// --- ROTA PARA ADICIONAR UM NOVO ENDEREÇO ---
+router.post('/:id_cliente/enderecos', async (req: Request, res: Response): Promise<any> => {
+  const { id_cliente } = req.params;
+  const { logradouro, numero, bairro, cidade, estado_siga, cep } = req.body;
+
+  if (!logradouro || !numero || !bairro || !cidade || !estado_siga || !cep) {
+    return res.status(400).json({ message: 'Todos os campos são obrigatórios.' });
+  }
+
+  try {
+    const result = await pool.query(
+      `INSERT INTO Endereco_Cliente (id_cliente, logradouro, numero, bairro, cidade, estado_siga, cep) 
+       VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
+      [id_cliente, logradouro, numero, bairro, cidade, estado_siga, cep]
+    );
+    res.status(201).json(result.rows[0]);
+  } catch (error) {
+    res.status(500).json({ message: 'Erro ao adicionar endereço.' });
+  }
+});
+
+// --- ROTA PARA ATUALIZAR UM ENDEREÇO ---
+router.put('/enderecos/:id_endereco', async (req: Request, res: Response): Promise<any> => {
+
+  const { id_endereco } = req.params;
+  const { logradouro, numero, bairro, cidade, estado_siga, cep } = req.body;
+
+  if (!logradouro || !numero || !bairro || !cidade || !estado_siga || !cep) {
+    return res.status(400).json({ message: 'Todos os campos são obrigatórios.' });
+  }
+
+  try {
+    const result = await pool.query(
+      `UPDATE Endereco_Cliente 
+       SET logradouro = $1, numero = $2, bairro = $3, cidade = $4, estado_siga = $5, cep = $6
+       WHERE id_endereco = $7 RETURNING *`,
+      [logradouro, numero, bairro, cidade, estado_siga, cep, id_endereco]
+    );
+    if (result.rowCount === 0) {
+      return res.status(404).json({ message: 'Endereço não encontrado.' });
+    }
+    res.status(200).json(result.rows[0]);
+  } catch (error) {
+    res.status(500).json({ message: 'Erro ao atualizar endereço.' });
+  }
+});
+
+// --- ROTA PARA DELETAR UM ENDEREÇO ---
+router.delete('/enderecos/:id_endereco', async (req: Request, res: Response): Promise<any> => {
+
+  const { id_endereco } = req.params;
+  try {
+    const result = await pool.query('DELETE FROM Endereco_Cliente WHERE id_endereco = $1', [id_endereco]);
+    if (result.rowCount === 0) {
+      return res.status(404).json({ message: 'Endereço não encontrado.' });
+    }
+    res.status(200).json({ message: 'Endereço deletado com sucesso.' });
+  } catch (error) {
+    res.status(500).json({ message: 'Erro ao deletar endereço.' });
+  }
+});
+
 export default router;
 

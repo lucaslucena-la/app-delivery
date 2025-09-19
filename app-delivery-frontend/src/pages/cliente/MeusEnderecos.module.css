@@ -1,269 +1,369 @@
+/* Container principal */
 .container {
-  max-width: 1000px;
-  margin: 2rem auto;
-  padding: 20px;
-  background-color: #f8f9fa;
-  min-height: 100vh;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  z-index: 2;
 }
 
+/* Cabeçalho */
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  flex-wrap: wrap;
-  gap: 15px;
-  margin-bottom: 40px;
+  width: 100%;
+  margin-bottom: 20px;
 }
 
 .header h1 {
-  font-size: 28px;
+  color: #ffffff;
+  font-size: 2rem;
   font-weight: 700;
-  color: #2d3436;
+  margin: 0;
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
   position: relative;
-  padding-bottom: 10px;
 }
 
 .header h1::after {
   content: '';
   position: absolute;
-  bottom: 0;
-  left: 0;
+  bottom: -5px;
+  left: 50%;
+  transform: translateX(-50%);
   width: 60px;
   height: 3px;
-  background-color: #e74c3c;
+  background-color: #ff6f61;
 }
 
+/* Botão de adicionar endereço */
 .addButton {
+  background-color: #ff6f61;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #ffffff;
   display: flex;
   align-items: center;
   gap: 8px;
-  background: #e74c3c;
-  color: white;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 8px;
-  font-size: 16px;
-  font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.3s ease, transform 0.06s ease;
 }
 
-.addButton:hover {
-  background: #c0392b;
+.addButton:hover,
+.addButton:focus {
+  background-color: #e65b50;
 }
 
-.list {
+.addButton:active {
+  transform: translateY(1px);
+}
+
+/* Container dos cartões */
+.cardsContainer {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 3 colunas fixas em desktop */
+  gap: 20px;
+  width: 100%;
+}
+
+/* Cartão de endereço */
+.card {
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  min-height: 180px; /* Altura fixa para uniformidade */
   display: flex;
   flex-direction: column;
-  gap: 20px;
-}
-
-.card {
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  padding: 20px;
-  display: flex;
   justify-content: space-between;
-  align-items: center;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 6px 20px rgba(255, 111, 97, 0.3);
 }
 
+/* Conteúdo do cartão */
 .cardContent {
   flex: 1;
 }
 
 .cardContent p {
+  color: #ffffff;
+  font-size: 0.9rem;
   margin: 4px 0;
-  font-size: 14px;
-  color: #636e72;
 }
 
-.cardContent p strong {
-  font-size: 16px;
-  color: #2d3436;
+.cardContent p:first-child {
+  font-weight: 600;
 }
 
+/* Ações do cartão */
 .cardActions {
   display: flex;
   gap: 10px;
+  justify-content: flex-end;
 }
 
 .cardActions button {
-  background: none;
+  background: transparent;
   border: none;
+  color: #ff6f61;
   cursor: pointer;
-  padding: 8px;
-  border-radius: 4px;
-  transition: background-color 0.3s ease;
+  transition: color 0.3s ease;
 }
 
-.cardActions button:first-child {
-  color: #3498db;
+.cardActions button:hover,
+.cardActions button:focus {
+  color: #e65b50;
 }
 
-.cardActions button:first-child:hover {
-  background: rgba(52, 152, 219, 0.1);
-}
-
-.cardActions button:last-child {
-  color: #e74c3c;
-}
-
-.cardActions button:last-child:hover {
-  background: rgba(231, 76, 60, 0.1);
-}
-
+/* Mensagem de carregamento ou sem endereços */
 .message {
-  font-size: 16px;
-  color: #636e72;
-  text-align: center;
-  padding: 20px;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-  margin-top: 20px;
-}
-
-.messageError {
-  font-size: 16px;
-  color: #e74c3c;
+  color: #ffffff;
+  font-size: 1.2rem;
+  font-weight: 500;
   text-align: center;
   padding: 15px;
-  background: rgba(231, 76, 60, 0.1);
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(10px);
   border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
   margin-top: 20px;
 }
 
+/* Mensagem de erro */
+.messageError {
+  color: #ff6f61;
+  font-size: 1.2rem;
+  font-weight: 500;
+  text-align: center;
+  padding: 15px;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(10px);
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  margin-top: 20px;
+}
+
+/* Overlay do modal */
 .modalOverlay {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
   z-index: 1000;
 }
 
+/* Conteúdo do modal */
 .modalContent {
-  background: white;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(10px);
   border-radius: 12px;
-  padding: 24px;
+  padding: 20px;
+  width: 100%;
   max-width: 500px;
-  width: 90%;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  position: relative;
+  top: 30%;
+  transform: translateY(10%);
+  overflow-y: auto; /* Adicione esta linha */
+  max-height: 80vh;
+
+  
 }
 
 .modalContent h2 {
-  font-size: 20px;
+  color: #ffffff;
+  font-size: 1.3rem;
   font-weight: 600;
-  color: #2d3436;
-  margin-bottom: 20px;
+  margin: 0 0 15px;
 }
 
-.modalContent form {
+/* Grupo de formulário no modal */
+.formGroup {
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 8px;
+  margin-bottom: 12px;
 }
 
-.modalContent input {
-  padding: 12px;
-  border: 1px solid #ddd;
+.formGroup label {
+  color: #ffffff;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.formGroup input {
+  width: 100%;
+  padding: 10px;
   border-radius: 8px;
-  font-size: 14px;
-  color: #333;
-  transition: border-color 0.3s ease;
-}
-
-.modalContent input:focus {
+  border: 1px solid #2c3e50;
+  background: rgba(0, 0, 0, 0.9);
+  color: #ffffff;
+  font-size: 0.9rem;
   outline: none;
-  border-color: #e74c3c;
-  box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1);
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
+.formGroup input::placeholder {
+  color: #8b98a5;
+}
+
+.formGroup input:focus {
+  border-color: #ff6f61;
+  box-shadow: 0 0 0 3px rgba(255, 111, 97, 0.35);
+}
+
+.formGroup input.inputError {
+  border-color: #ff6f61;
+}
+
+/* Mensagem de erro no modal */
+.errorMessage {
+  color: #ff6f61;
+  font-size: 0.8rem;
+  margin-top: 4px;
+}
+
+/* Ações do modal */
 .modalActions {
   display: flex;
-  justify-content: flex-end;
   gap: 10px;
+  justify-content: flex-end;
   margin-top: 20px;
 }
 
-.modalActions button {
-  padding: 10px 20px;
+.cancelButton {
+  background: transparent;
+  border: 1px solid #ff6f61;
   border-radius: 8px;
-  font-size: 14px;
-  font-weight: 500;
+  padding: 10px 16px;
+  font-size: 0.9rem;
+  color: #ff6f61;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-.modalActions button:first-child {
-  background: #ecf0f1;
-  color: #2d3436;
+.cancelButton:hover,
+.cancelButton:focus {
+  background-color: #ff6f61;
+  color: #ffffff;
+}
+
+.saveButton {
+  background-color: #ff6f61;
   border: none;
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #ffffff;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.06s ease;
 }
 
-.modalActions button:first-child:hover {
-  background: #dfe6e9;
+.saveButton:hover,
+.saveButton:focus {
+  background-color: #e65b50;
 }
 
-.modalActions button:last-child {
-  background: #e74c3c;
-  color: white;
-  border: none;
+.saveButton:active {
+  transform: translateY(1px);
 }
 
-.modalActions button:last-child:hover {
-  background: #c0392b;
-}
-
-@media (max-width: 768px) {
-  .container {
-    padding: 15px;
+/* Responsividade */
+@media (max-width: 992px) {
+  .cardsContainer {
+    grid-template-columns: repeat(2, 1fr); /* 2 colunas em tablets */
   }
 
   .header h1 {
-    font-size: 24px;
-  }
-
-  .card {
-    padding: 15px;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-  }
-
-  .cardActions {
-    justify-content: flex-end;
-    width: 100%;
+    font-size: 1.8rem;
   }
 }
 
-@media (max-width: 576px) {
+@media (max-width: 600px) {
+  .cardsContainer {
+    grid-template-columns: 1fr; /* 1 coluna em mobile */
+  }
+
+  .container {
+    padding: 20px 15px;
+  }
+
+  .header {
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-start;
+  }
+
+  .header h1 {
+    font-size: 1.5rem;
+  }
+
   .addButton {
-    width: 100%;
-    justify-content: center;
+    font-size: 0.85rem;
+    padding: 8px 12px;
+  }
+
+  .card {
+    min-height: 160px; /* Altura menor em mobile */
+    padding: 12px;
+  }
+
+  .cardContent p {
+    font-size: 0.85rem;
+  }
+
+  .cardActions button {
+    font-size: 0.8rem;
+  }
+
+  .message,
+  .messageError {
+    font-size: 1rem;
+    padding: 12px;
   }
 
   .modalContent {
-    padding: 16px;
+    padding: 15px;
+    max-width: 90%;
   }
 
   .modalContent h2 {
-    font-size: 18px;
+    font-size: 1.2rem;
+  }
+
+  .formGroup label {
+    font-size: 0.85rem;
+  }
+
+  .formGroup input {
+    font-size: 0.85rem;
+    padding: 8px;
+  }
+
+  .errorMessage {
+    font-size: 0.75rem;
   }
 
   .modalActions button {
-    padding: 8px 16px;
-    font-size: 13px;
+    font-size: 0.85rem;
+    padding: 8px 12px;
   }
 }

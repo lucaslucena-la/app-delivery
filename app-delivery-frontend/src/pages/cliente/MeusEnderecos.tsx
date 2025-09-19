@@ -4,7 +4,6 @@ import { getEnderecos, addEndereco, updateEndereco, deleteEndereco, type Enderec
 import styles from './MeusEnderecos.module.css';
 import { PlusCircle, Edit, Trash2 } from 'lucide-react';
 
-// --- COMPONENTE DO MODAL ---
 interface ModalProps {
   endereco: Endereco | null;
   onClose: () => void;
@@ -34,11 +33,9 @@ function EnderecoModal({ endereco, onClose, onSave }: ModalProps) {
     const { name, value } = e.target;
 
     if (name === 'cep') {
-      // Allow only digits and limit to 8 characters
       const cleanedValue = value.replace(/\D/g, '').slice(0, 8);
       setFormData({ ...formData, cep: cleanedValue });
 
-      // Validate CEP (exactly 8 digits)
       if (cleanedValue.length === 8) {
         setCepError(null);
       } else {
@@ -134,8 +131,8 @@ function EnderecoModal({ endereco, onClose, onSave }: ModalProps) {
             {cepError && <span className={styles.errorMessage}>{cepError}</span>}
           </div>
           <div className={styles.modalActions}>
-            <button type="button" onClick={onClose}>Cancelar</button>
-            <button type="submit">Salvar</button>
+            <button type="button" className={styles.cancelButton} onClick={onClose}>Cancelar</button>
+            <button type="submit" className={styles.saveButton}>Salvar</button>
           </div>
         </form>
       </div>
@@ -143,13 +140,11 @@ function EnderecoModal({ endereco, onClose, onSave }: ModalProps) {
   );
 }
 
-// --- COMPONENTE PRINCIPAL DA PÁGINA ---
 export default function MeusEnderecos() {
   const [enderecos, setEnderecos] = useState<Endereco[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
-  // Controle do Modal
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingEndereco, setEditingEndereco] = useState<Endereco | null>(null);
 
@@ -179,13 +174,13 @@ export default function MeusEnderecos() {
     if (!user?.id_cliente) return;
 
     try {
-      if (editingEndereco) { // Se está editando
+      if (editingEndereco) {
         await updateEndereco(editingEndereco.id_endereco, payload);
-      } else { // Se está adicionando
+      } else {
         await addEndereco(user.id_cliente, payload);
       }
       closeModal();
-      await fetchEnderecos(); // Recarrega a lista
+      await fetchEnderecos();
     } catch (err) {
       alert("Erro ao salvar endereço. Verifique os dados.");
     }
@@ -195,7 +190,7 @@ export default function MeusEnderecos() {
     if (window.confirm("Tem certeza que deseja excluir este endereço?")) {
       try {
         await deleteEndereco(id_endereco);
-        await fetchEnderecos(); // Recarrega a lista
+        await fetchEnderecos();
       } catch (err) {
         alert("Não foi possível excluir o endereço.");
       }
@@ -226,7 +221,7 @@ export default function MeusEnderecos() {
         </button>
       </div>
       
-      <div className={styles.list}>
+      <div className={styles.cardsContainer}>
         {enderecos.length === 0 ? (
           <p className={styles.message}>Nenhum endereço cadastrado.</p>
         ) : (

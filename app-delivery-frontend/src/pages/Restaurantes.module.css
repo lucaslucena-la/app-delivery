@@ -1,19 +1,21 @@
 .container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 20px;
-  min-height: 100vh;
-  background-color: #f8f9fa;
+  padding: 40px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  z-index: 2;
 }
 
 .title {
-  font-size: 28px;
+  color: #ffffff;
+  font-size: 2rem;
   font-weight: 700;
-  color: #2d3436;
+  margin-bottom: 30px;
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
   text-align: center;
-  margin-bottom: 40px;
-  position: relative;
-  padding-bottom: 10px;
 }
 
 .title::after {
@@ -67,7 +69,7 @@
 .cardTitle {
   font-size: 18px;
   font-weight: 600;
-  color: #2d3436;
+  color: #362d2d;
   margin: 0;
 }
 

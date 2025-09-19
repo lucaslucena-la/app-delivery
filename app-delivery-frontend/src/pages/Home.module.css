@@ -34,6 +34,7 @@
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
   z-index: 1000;
   transition: all 0.3s ease;
+  margin-top: -50px;
 }
 
 .floatingNavbar .navbar-brand {
@@ -43,6 +44,7 @@
   letter-spacing: 1px;
   text-decoration: none !important;
 }
+
 
 .floatingNavbar .nav-link {
   color: #ffffff !important;

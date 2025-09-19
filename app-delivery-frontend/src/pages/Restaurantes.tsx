@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { listarRestaurantes } from "../services/restaurante";
 import type { Restaurante } from "../services/restaurante"; 
 import RestauranteCard from "../components/RestauranteCard";
-import styles from "./Restaurantes.module.css"; // Import the CSS module
+import styles from "./Restaurantes.module.css"; 
 
 export default function Restaurantes() {
   const [data, setData] = useState<Restaurante[]>([]);

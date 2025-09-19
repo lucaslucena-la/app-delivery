@@ -4,18 +4,14 @@ import { catalogoRestaurante } from "../services/restaurante.ts";
 import type { Prato } from "../services/restaurante.ts";
 import { useCarrinho } from "../context/CarrinhoContext.tsx";
 import ModalConfirmacao from "../components/ModalConfirmacao.tsx";
+import styles from "./Catalogo.module.css";
 
 export default function Catalogo() {
   const { id } = useParams();
-  
-  // --- ALTERADO: Pegamos as novas funções e o ID do restaurante do carrinho ---
-  const { adicionarItem, clearCart, restauranteId } = useCarrinho(); 
-  
+  const { adicionarItem, clearCart, restauranteId } = useCarrinho();
   const [pratos, setPratos] = useState<Prato[]>([]);
   const [feedback, setFeedback] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
-
-  // --- NOVO: Estados para controlar o modal de confirmação ---
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [pratoPendente, setPratoPendente] = useState<Prato | null>(null);
 
@@ -26,30 +22,24 @@ export default function Catalogo() {
     });
   }, [id]);
 
-  // --- LÓGICA PRINCIPAL ATUALIZADA ---
   function handleAdicionarAoCarrinho(prato: Prato) {
-    // Verifica se o carrinho já tem itens e se o restaurante é diferente
     if (restauranteId && restauranteId !== prato.id_restaurante) {
-      // Se for diferente, guarda o prato e abre o modal
       setPratoPendente(prato);
       setIsModalOpen(true);
     } else {
-      // Se não, adiciona o item normalmente
       adicionarItem(prato);
       setFeedback(`${prato.nome} adicionado ao carrinho!`);
       setTimeout(() => setFeedback(null), 2000);
     }
   }
 
-  // --- NOVA FUNÇÃO: Chamada quando o usuário confirma no modal ---
   function handleEsvaziarEAdicionar() {
     if (pratoPendente) {
-      clearCart(); // Esvazia o carrinho
-      adicionarItem(pratoPendente); // Adiciona o novo item
+      clearCart();
+      adicionarItem(pratoPendente);
       setFeedback(`${pratoPendente.nome} adicionado ao carrinho!`);
       setTimeout(() => setFeedback(null), 2000);
     }
-    // Fecha o modal e limpa o estado
     setIsModalOpen(false);
     setPratoPendente(null);
   }
@@ -66,21 +56,30 @@ export default function Catalogo() {
         <p>Deseja esvaziar a sacola e adicionar este novo item?</p>
       </ModalConfirmacao>
 
-      <div style={{ maxWidth: 800, margin: "2rem auto", padding: 16 }}>
-        <h2>Catálogo</h2>
-        {err && <p style={{ color: "crimson" }}>{err}</p>}
-        {feedback && <p style={{ color: "green" }}>{feedback}</p>}
+      <div className={styles.container}>
+        <h2 className={styles.title}>Catálogo</h2>
+        {err && <p className={styles.error}>{err}</p>}
+        {feedback && <p className={styles.feedback}>{feedback}</p>}
 
-        {pratos.map(p => (
-          <div key={p.id_prato} style={{ border: "1px solid #eee", padding: 12, borderRadius: 8, marginBottom: 8 }}>
-            <strong>{p.nome}</strong>
-            <div>{p.descricao}</div>
-            <div>Preço: R$ {(p.valor / 100).toFixed(2)}</div>
-            <div style={{ marginTop: 8 }}>
-              <button onClick={() => handleAdicionarAoCarrinho(p)}>Adicionar ao Carrinho</button>
-            </div>
+        {pratos.length > 0 ? (
+          <div className={styles.grid}>
+            {pratos.map(p => (
+              <div key={p.id_prato} className={styles.card}>
+                <strong className={styles.cardTitle}>{p.nome}</strong>
+                <div className={styles.cardDescription}>{p.descricao}</div>
+                <div className={styles.cardPrice}>Preço: R$ {(p.valor / 100).toFixed(2)}</div>
+                <button
+                  onClick={() => handleAdicionarAoCarrinho(p)}
+                  className={styles.cardButton}
+                >
+                  Adicionar ao Carrinho
+                </button>
+              </div>
+            ))}
           </div>
-        ))}
+        ) : (
+          <p className={styles.emptyMessage}>Nenhum prato encontrado no momento.</p>
+        )}
       </div>
     </>
   );

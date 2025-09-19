@@ -68,6 +68,7 @@ body {
 
 .logo:hover{
   text-decoration: none;
+  color: #ff6f61;
 }
 
 /* --------- Main split (Image | Form) --------- */

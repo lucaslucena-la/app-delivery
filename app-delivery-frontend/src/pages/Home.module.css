@@ -135,17 +135,16 @@
 }
 
 /* Estilos do subtítulo (descomente se necessário) */
-/*
+
 .subtitle {
   font-size: 1.5rem;
   font-weight: 300;
   margin-bottom: 30px;
   opacity: 0.9;
 }
-*/
+
 
 /* Estilos do formulário de busca (descomente se necessário) */
-/*
 .search {
   display: flex;
   align-items: center;
@@ -193,7 +192,7 @@
 .primaryBtn:hover {
   background-color: #e65b50;
 }
-*/
+
 
 /* Estilos do link de parceiro */
 .partner {
@@ -243,11 +242,11 @@
     font-size: 2.5rem;
   }
 
-  /*
+  
   .subtitle {
     font-size: 1.2rem;
   }
-  */
+  
 }
 
 @media (max-width: 576px) {
@@ -260,7 +259,7 @@
     font-size: 2rem;
   }
 
-  /*
+ 
   .search {
     flex-direction: column;
   }
@@ -268,5 +267,5 @@
   .primaryBtn {
     width: 100%;
   }
-  */
+  
 }

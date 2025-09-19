@@ -27,7 +27,10 @@ export default function Home() {
     autoplaySpeed: 3000,
     arrows: false,
     fade: true,
-  };
+    pauseOnHover: false, 
+    pauseOnDotsHover: false,
+    pauseOnFocus: false, 
+  }
 
   // Lista de imagens para o carrossel (substitua pelos caminhos reais)
   const images = [

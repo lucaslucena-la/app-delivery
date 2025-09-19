@@ -67,10 +67,10 @@ export default function ClienteLayout() {
                   </button>
                   {isMenuOpen && (
                     <div className={styles.dropdownMenu}>
-                      <Link to="/minha-conta/perfil" className={styles.dropdownItem} onClick={() => setIsMenuOpen(false)}>
+                      <Link to="/minha-conta/perfil" className={`${styles.dropdownItem} ${styles.Button}`} onClick={() => setIsMenuOpen(false)}>
                         Meu Perfil
                       </Link>
-                      <Link to="/minha-conta/enderecos" className={styles.dropdownItem} onClick={() => setIsMenuOpen(false)}>
+                      <Link to="/minha-conta/enderecos" className={`${styles.dropdownItem} ${styles.Button}`} onClick={() => setIsMenuOpen(false)}>
                         Meus Endereços
                       </Link>
                       <button
@@ -85,7 +85,7 @@ export default function ClienteLayout() {
               </>
             ) : (
               <>
-                <Link to="/login" className={styles.navLink}>
+                <Link to="/login" className={`${styles.navLink} ${styles.entrarButton}`} >
                   Entrar
                 </Link>
                 <Link to="/cadastro" className={`${styles.navLink} ${styles.ctaButton}`}>

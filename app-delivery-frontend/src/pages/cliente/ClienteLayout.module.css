@@ -74,12 +74,15 @@
   align-items: center;
   gap: 8px;
   transition: color 0.3s ease;
+  background: none;       /* remove fundo padrão azul */
+
 }
 
 .navLink:hover,
 .navLink:focus {
   color: #ff6f61;
   text-decoration: none;
+  background: none;
 }
 
 /* Botão de call-to-action (Criar Conta) */
@@ -91,8 +94,11 @@
 
 .ctaButton:hover,
 .ctaButton:focus {
-  color: #ffffff;
+  color: #ff6f61;
 }
+
+
+
 
 /* Link do carrinho */
 .cartLink {
@@ -241,4 +247,10 @@
   .mainContent {
     padding: 60px 15px 15px;
   }
+}
+
+.Button:hover{
+  text-decoration: none ;
+  color: #ffffff;
+  border-radius: 10px;
 }

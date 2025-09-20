@@ -1,9 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useCarrinho } from '../../context/CarrinhoContext';
-import { criarPedido } from '../../services/pedido';
-import { getUser } from '../../store/auth';
-import styles from './Carrinho.module.css'; // Import the CSS module
+import { useCarrinho } from '../../context/CarrinhoContext.tsx';
+import { criarPedido } from '../../services/pedido.ts';
+import { getUser } from '../../store/auth.ts';
+import { getRestauranteDetalhes, type Restaurante } from '../../services/restaurante.ts';
+import { checkIfOpen } from '../../utils/horarios.ts';
+import styles from './Carrinho.module.css';
 
 type FormaDePagamento = "pix" | "em_especie" | "credito" | "debito";
 
@@ -15,14 +17,38 @@ const formasPagamentoLabels: { [key in FormaDePagamento]: string } = {
 };
 
 export default function Carrinho() {
+  // --- CORREÇÃO: A variável 'restauranteId' já estava sendo pega corretamente do contexto ---
+  const { items, restauranteId, total, updateQuantity, updateObservacao, removeFromCart, clearCart } = useCarrinho();
   const navigate = useNavigate();
-  const { items, total, updateQuantity, updateObservacao, removeFromCart, clearCart } = useCarrinho();
   
   const [msg, setMsg] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [formaPagamento, setFormaPagamento] = useState<FormaDePagamento | ''>('');
 
+  const [isAberto, setIsAberto] = useState(true);
+  const [isLoadingStatus, setIsLoadingStatus] = useState(true);
+
+  useEffect(() => {
+    if (restauranteId) {
+      setIsLoadingStatus(true);
+      getRestauranteDetalhes(restauranteId)
+        // --- CORREÇÃO: Define o tipo do parâmetro 'data' ---
+        .then((data: Restaurante) => {
+          setIsAberto(checkIfOpen(data.horarios));
+        })
+        .catch(() => {
+          setIsAberto(false);
+        })
+        .finally(() => {
+          setIsLoadingStatus(false);
+        });
+    } else {
+      setIsLoadingStatus(false);
+    }
+  }, [restauranteId]);
+
   async function fazerPedido() {
+    // ... (sua lógica de fazer pedido permanece a mesma)
     console.log("Iniciando a finalização do pedido. Verificando usuário...");
     const user = getUser();
     console.log("Dados do usuário que o carrinho está vendo:", user);
@@ -148,8 +174,20 @@ export default function Carrinho() {
           
           <div className={styles.summarySection}>
             <h3 className={styles.total}>Total: R$ {(total / 100).toFixed(2)}</h3>
-            <button onClick={fazerPedido} className={styles.checkoutButton}>
-              Finalizar Pedido
+            {/* --- MENSAGEM DE AVISO ADICIONADA --- */}
+            {!isAberto && restauranteId && (
+              <p className={styles.fechadoError}>
+                O restaurante está fechado e não pode aceitar seu pedido.
+              </p>
+            )}
+            
+            {/* --- BOTÃO ATUALIZADO --- */}
+            <button 
+              onClick={fazerPedido} 
+              className={styles.checkoutButton}
+              disabled={!isAberto || items.length === 0 || isLoadingStatus}
+            >
+              {isLoadingStatus ? 'Verificando horário...' : 'Finalizar Pedido'}
             </button>
           </div>
         </>

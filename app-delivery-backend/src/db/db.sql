@@ -145,6 +145,8 @@ CREATE TABLE Avaliacoes (
     data TIMESTAMP,
     id_restaurante INT NOT NULL,
     id_cliente INT NOT NULL,
+    id_pedido INT UNIQUE, 
     FOREIGN KEY (id_restaurante) REFERENCES Restaurante(id_restaurante),
-    FOREIGN KEY (id_cliente) REFERENCES Cliente(id_cliente)
+    FOREIGN KEY (id_cliente) REFERENCES Cliente(id_cliente),
+    FOREIGN KEY (id_pedido) REFERENCES Pedido(id_pedido)
 );

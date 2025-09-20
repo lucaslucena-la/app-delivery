@@ -10,10 +10,13 @@ type ItemPedidoPayload = {
 // Define a estrutura da resposta da rota de histórico
 export interface PedidoClienteResponse {
   id_pedido: number;
+  id_restaurante: number; 
   nome_restaurante: string;
   data_pedido: string;
   status: string;
   valor: number;
+  foi_avaliado: boolean; 
+
   items: {
     nome_prato: string;
     quantidade_item: number;
@@ -51,4 +54,5 @@ export async function getPedidosCliente(id_cliente: number): Promise<PedidoClien
   const { data } = await api.get(`/pedidos/cliente/${id_cliente}`);
   return data;
 }
+
 

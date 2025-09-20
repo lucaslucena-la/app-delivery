@@ -256,9 +256,12 @@ router.get('/cliente/:id_cliente', async (req: Request, res: Response): Promise<
     const result = await pool.query(
       `SELECT 
          p.*, 
-         r.nome AS nome_restaurante 
+         r.nome AS nome_restaurante,
+         -- Adiciona um campo booleano para indicar se o pedido já foi avaliado
+         CASE WHEN a.avaliacao_id IS NOT NULL THEN TRUE ELSE FALSE END AS foi_avaliado
        FROM Pedido p
        JOIN Restaurante r ON p.id_restaurante = r.id_restaurante
+       LEFT JOIN Avaliacoes a ON p.id_pedido = a.id_pedido -- LEFT JOIN para incluir todos os pedidos
        WHERE p.id_cliente = $1
        ORDER BY p.data_pedido DESC;`,
       [clienteId]
